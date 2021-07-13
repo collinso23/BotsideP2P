@@ -1,0 +1,7 @@
+share/*
+bin/*
+include/*
+lib*
+pyenv.cfg
+Screenshots/*
+examples/*
