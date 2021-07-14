@@ -6,6 +6,7 @@ from twisted.python import log
 import sys
 import hashlib
 import re
+import asyncio
 
 # Custom protocol which interprets commands and then passes them to the correct location in our DHT.
 # We're powering it with std input for this demo, but this could easy be powered by ssh, telnet, another kademlia network, etc
@@ -114,7 +115,7 @@ class SlaveDriver(basic.LineReceiver):
             self.parsecommands(line)
 
 if len(sys.argv) != 4:
-    print "Usage: python commander.py <bootstrap ip> <bootstrap port> <commander port>"
+    print("Usage: python commander.py <bootstrap ip> <bootstrap port> <commander port>")
     exit(0)
 
 boot_ip = str(sys.argv[1])
@@ -124,9 +125,9 @@ myport = int(sys.argv[3])
 # log.startLogging(sys.stdout)
 
 kserver = Server()
-kserver.listen(myport)
+await kserver.listen(myport)
 # need a bootstrap address to join the network.
-kserver.bootstrap([(boot_ip, boot_port)])
+await kserver.bootstrap([(boot_ip, boot_port)])
 key = hashlib.sha1()
 
 # This is an arbitray key in DHT where a bot reports its existence.

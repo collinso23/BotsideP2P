@@ -25,21 +25,34 @@
 from twisted.application import service, internet
 from twisted.python.log import ILogObserver
 from twisted.internet import reactor, task
+import asyncio
 
 import sys, os
 sys.path.append(os.path.dirname(__file__))
 from kademlia.network import Server
-#from kademlia import log
+
+logfile = open("logs/twistd-logging.log", "a")
+
+def log(eventDict):
+    # untilConcludes is necessary to retry the operation when the system call
+    #     # has been interrupted.
+    untillConcludes(logfile.write, "Got a log! {}\n".format(eventDict))
+    untilConcludes(logfile.flush)
+    #
 
 application = service.Application("kademlia")
-#application.setComponent(ILogObserver, log.FileLogObserver(sys.stdout, log.INFO).emit)
-
+application.setComponent(ILogObserver, log)
+loop = asyncio.get_event_loop()
 if os.path.isfile('cache.pickle'):
     kserver = Server.load_state('cache.pickle')
 else:
     kserver = Server()
-    kserver.bootstrap([("192.168.50.61", 8468)])
+    kserver.listen(8468)
+    default=("127.0.0.1", 8468)
+    kserver.bootstrap([("127.0.0.1", 8468)])
+    #loop.run_until_complete(kserver.bootstrap([default])
 kserver.save_state_regularly('cache.pickle', 10)
 
 server = internet.UDPServer(8468, kserver.protocol)
 server.setServiceParent(application)
+reactor.run()
