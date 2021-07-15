@@ -22,9 +22,9 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from twisted.application import service, internet
-from twisted.python.log import ILogObserver
-from twisted.internet import reactor, task
+#from twisted.application import service, internet
+#from twisted.python.log import ILogObserver
+#from twisted.internet import reactor, task
 import asyncio
 
 import sys, os
@@ -40,8 +40,8 @@ def log(eventDict):
     untilConcludes(logfile.flush)
     #
 
-application = service.Application("kademlia")
-application.setComponent(ILogObserver, log)
+#application = service.Application("kademlia") #Replace with asyncio
+#application.setComponent(ILogObserver, log) #Replace with logging
 loop = asyncio.get_event_loop()
 if os.path.isfile('cache.pickle'):
     kserver = Server.load_state('cache.pickle')
@@ -53,6 +53,6 @@ else:
     #loop.run_until_complete(kserver.bootstrap([default])
 kserver.save_state_regularly('cache.pickle', 10)
 
-server = internet.UDPServer(8468, kserver.protocol)
+#server = internet.UDPServer(8468, kserver.protocol) #Replace with asyncio
 server.setServiceParent(application)
-reactor.run()
+reactor.run() #Replace with asyncio
