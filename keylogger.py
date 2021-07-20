@@ -13,7 +13,7 @@ path = None
 
 def main():
     if (len(sys.argv) < 2):
-            print "Correct usage is: python keylogger.py [logfile directory]"
+            print("Correct usage is: python keylogger.py [logfile directory]")
             sys.exit(1)
     path = sys.argv[1]
     try:

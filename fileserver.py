@@ -8,7 +8,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         #Handle GET Request
         try:
             filepath = "filehost"+self.path
-            print "Filepath: "+filepath
+            print("Filepath: "+filepath)
             f=open(filepath, "rb")
 
             self.send_response(200)
@@ -55,10 +55,10 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 def launchServer(port):
     try:
         server = ThreadedHTTPServer(('',port), RequestHandler)
-        print "Starting file server"
+        print("Starting file server")
         server.serve_forever()
     except KeyboardInterrupt:
-        print "Shutting down server"
+        print("Shutting down server")
         server.socket.close()
 
 def main():

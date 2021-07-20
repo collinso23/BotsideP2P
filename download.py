@@ -21,6 +21,7 @@ def download(host, port, filepath):
 #use: python download.py [host] [port] [filepath]
 def main():
     if len(sys.argv) != 4:
+        print("usage: python download.py [host] [port] [filepath]")
         sys.exit(1)
     host = sys.argv[1]
     port = int(sys.argv[2])

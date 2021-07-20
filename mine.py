@@ -56,18 +56,18 @@ class BitcoinRPC:
                     
         resp = self.conn.getresponse()
         if resp is None:
-            print "JSON-RPC: no response"
+            print("JSON-RPC: no response")
             return None
                 
         body = resp.read()
         resp_obj = json.loads(body)
         if resp_obj is None:
-            print "JSON-RPC: cannot JSON-decode body"
+            print("JSON-RPC: cannot JSON-decode body")
             return None
         if 'error' in resp_obj and resp_obj['error'] != None:
             return resp_obj['error']
         if 'result' not in resp_obj:
-            print "JSON-RPC: no result in object"
+            print("JSON-RPC: no result in object")
             return None
                 
         return resp_obj['result']
@@ -77,7 +77,7 @@ class BitcoinRPC:
         return self.rpc('getwork', data)
 
 def uint32(x):
-    return x & 0xffffffffL
+    return x & 0xffffffffL #L <- This was at EOL, not sure if its typo
 
 def bytereverse(x):
     return uint32(( ((x) << 24) | (((x) << 8) & 0x00ff0000) |
@@ -148,10 +148,10 @@ class Miner:
                         
             # proof-of-work test:  hash < target
             if l < target:
-                print time.asctime(), "PROOF-OF-WORK found: %064x" % (l,)
+                print(time.asctime(), "PROOF-OF-WORK found: %064x" % (l,))
                 return (nonce + 1, nonce_bin)
             else:
-                print time.asctime(), "PROOF-OF-WORK false positive %064x" % (l,)
+                print(time.asctime(), "PROOF-OF-WORK false positive %064x" % (l,))
             #				return (nonce + 1, nonce_bin)
                                 
         return (nonce + 1, None)
@@ -162,7 +162,7 @@ class Miner:
         solution = original_data[:152] + nonce + original_data[160:256]
         param_arr = [ solution ]
         result = rpc.getwork(param_arr)
-        print time.asctime(), "--> Upstream RPC result:", result
+        print(time.asctime(), "--> Upstream RPC result:", result)
                             
     def iterate(self, rpc):
         work = rpc.getwork()
@@ -186,9 +186,9 @@ class Miner:
             self.max_nonce = 0xfffffffaL
                                                                                         
         if settings['hashmeter']:
-            print "HashMeter(%d): %d hashes, %.2f Khash/sec" % (
+            print("HashMeter(%d): %d hashes, %.2f Khash/sec" % (
                 self.id, hashes_done,
-                (hashes_done / 1000.0) / time_diff)
+                (hashes_done / 1000.0) / time_diff))
                                                                                                 
         if nonce_bin is not None:
             self.submit_work(rpc, work['data'], nonce_bin)
@@ -208,7 +208,7 @@ def miner_thread(id):
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print "Usage: pyminer.py Username Password"
+        print("Usage: pyminer.py Username Password")
         sys.exit(1)
 
     settings['host'] = '127.0.0.1'
@@ -233,13 +233,13 @@ if __name__ == '__main__':
         time.sleep(1)			# stagger threads
  
 
-#print settings['threads'], "mining threads started"
+#print(settings['threads'], "mining threads started")
         
-#   print time.asctime(), "Miner Starts - %s:%s" % (settings['host'], settings['port'])
+#   print(time.asctime(), "Miner Starts - %s:%s" % (settings['host'], settings['port']))
     try:
         for thr_proc in thr_list:
             thr_proc.join()
     except KeyboardInterrupt:
         pass
-#   print time.asctime(), "Miner Stops - %s:%s" % (settings['host'], settings['port'])
+#   print(time.asctime(), "Miner Stops - %s:%s" % (settings['host'], settings['port']))
 

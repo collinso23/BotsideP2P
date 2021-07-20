@@ -12,6 +12,7 @@ def upload(host, port, filepath):
 #use: python upload.py [host] [port] [filepath]
 def main():
     if len(sys.argv) != 4:
+        print("usage: python upload.py [host] [port] [filepath]")
         sys.exit(1)
     host = sys.argv[1]
     port = int(sys.argv[2])

