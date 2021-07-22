@@ -18,15 +18,14 @@ loop=asyncio.get_event_loop()
 
 async def run():
     server = Server()
-    await server.listen(8468)
+    await server.listen(8469)
     bootstrap_node = (sys.argv[1], int(sys.argv[2] ))
-    ## Connect to bootstrap server
     await server.bootstrap([bootstrap_node])
     await server.set(sys.argv[3], sys.argv[4])
     server.stop()
 
 try:
-    loop.run_until_complete(run())
+    loop.run_forever(run())
 except KeyboardInterrupt:
     pass
 finally:

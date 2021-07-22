@@ -15,14 +15,20 @@ log = logging.getLogger('kademlia')
 log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 loop=asyncio.get_event_loop()
+
+server = Server()
+loop.run_until_complete(server.listen())
+
+
+
 async def run():
     server = Server()
-    await server.listen(8469)
+    await server.listen(8468)
     bootstrap_node = (sys.argv[1], int(sys.argv[2]))
     await server.bootstrap([bootstrap_node])
 
     result = await server.get(sys.argv[3])
     print("Get result:", result)
-    server.stop()
+    
 
 loop.run_until_complete(run())

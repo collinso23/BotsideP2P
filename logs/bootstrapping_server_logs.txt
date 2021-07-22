@@ -1,0 +1,134 @@
+BotsideP2P) nodey@ProjectNode4:~/BotsideP2P$ python examples/bootstrap_tac.py 
+2021-07-21 20:05:48,958 - kademlia.network - INFO - Node 715286934021511908161198832222654389693545926616 listening on 0.0.0.0:8468
+2021-07-21 20:05:48,968 - kademlia.network - DEBUG - Refreshing routing table
+2021-07-21 20:06:40,518 - kademlia.protocol - INFO - never seen 192.168.50.111:8469 before, adding to router
+2021-07-21 20:06:40,536 - kademlia.protocol - INFO - finding neighbors of 234150112385717407254396517857841446016900154922 in local table
+2021-07-21 20:06:40,542 - kademlia.protocol - INFO - finding neighbors of 234150112385717407254396517857841446016900154922 in local table
+2021-07-21 20:06:40,556 - kademlia.protocol - DEBUG - got a store request from ('192.168.50.111', 8469), storing 'e193a01ecf8d30ad0affefd332ce934e32ffce72'='001'
+2021-07-21 20:06:51,222 - kademlia.protocol - INFO - never seen 192.168.50.111:8469 before, adding to router
+2021-07-21 20:06:51,228 - kademlia.protocol - INFO - got successful response from 192.168.50.111:8469
+2021-07-21 20:06:51,229 - kademlia.protocol - INFO - finding neighbors of 924131588117070868229063773895367025797257005726 in local table
+2021-07-21 20:12:26,427 - kademlia.protocol - INFO - never seen 192.168.50.61:8469 before, adding to router
+2021-07-21 20:12:26,437 - kademlia.protocol - INFO - finding neighbors of 1303175823489479832752305655967083826298352630775 in local table
+2021-07-21 20:12:52,333 - kademlia.protocol - INFO - never seen 192.168.50.61:8469 before, adding to router
+2021-07-21 20:12:52,339 - kademlia.protocol - INFO - finding neighbors of 1139827136631568738510525028518994511582714402757 in local table
+2021-07-21 20:12:57,455 - kademlia.protocol - INFO - finding neighbors of 1139827136631568738510525028518994511582714402757 in local table
+2021-07-21 20:13:02,476 - kademlia.protocol - DEBUG - got a store request from ('192.168.50.61', 8469), storing 'e193a01ecf8d30ad0affefd332ce934e32ffce72'='002'
+2021-07-21 20:13:05,850 - kademlia.protocol - INFO - never seen 192.168.50.61:8469 before, adding to router
+2021-07-21 20:13:05,856 - kademlia.protocol - INFO - finding neighbors of 1199095249299229028753503346992619743262209528235 in local table
+2021-07-21 20:13:38,889 - kademlia.protocol - INFO - never seen 192.168.50.111:8469 before, adding to router
+2021-07-21 20:13:38,891 - kademlia.protocol - INFO - finding neighbors of 801070062603587927913275346794964303533091819417 in local table
+2021-07-21 20:14:02,172 - kademlia.protocol - INFO - never seen 192.168.50.61:8469 before, adding to router
+2021-07-21 20:14:02,189 - kademlia.protocol - INFO - finding neighbors of 826133873535020137129845677632017395517399819523 in local table
+2021-07-21 20:14:07,292 - kademlia.protocol - INFO - finding neighbors of 826133873535020137129845677632017395517399819523 in local table
+2021-07-21 20:14:12,418 - kademlia.protocol - DEBUG - got a store request from ('192.168.50.61', 8469), storing '6fc978af728d43c59faa400d5f6e0471ac850d4c'='002'
+2021-07-21 20:14:19,788 - kademlia.protocol - INFO - never seen 192.168.50.111:8469 before, adding to router
+2021-07-21 20:14:19,791 - kademlia.protocol - INFO - got successful response from 192.168.50.111:8469
+2021-07-21 20:14:19,791 - kademlia.protocol - INFO - finding neighbors of 1098218117853989250722143752613456622490611886820 in local table
+2021-07-21 21:05:48,981 - kademlia.network - DEBUG - Refreshing routing table
+2021-07-21 21:17:40,869 - kademlia.protocol - INFO - never seen 192.168.50.109:8469 before, adding to router
+2021-07-21 21:17:40,886 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8469
+2021-07-21 21:17:40,889 - kademlia.protocol - INFO - finding neighbors of 173967704501533697179039366931180446494612847354 in local table
+2021-07-21 21:39:34,187 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 21:39:34,194 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 21:39:34,195 - kademlia.protocol - INFO - finding neighbors of 127417725429126172047290313571581661926318092926 in local table
+2021-07-21 21:40:45,677 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 21:40:45,693 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 21:40:45,701 - kademlia.protocol - INFO - finding neighbors of 240960756887134701878563694359199249030964329997 in local table
+2021-07-21 21:41:36,185 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 21:41:36,218 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 21:41:36,228 - kademlia.protocol - INFO - finding neighbors of 195995527175561803923922852774572087959887960892 in local table
+2021-07-21 21:43:19,793 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 21:43:19,807 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 21:43:19,810 - kademlia.protocol - INFO - finding neighbors of 173272442161499200772890961676711037067472464045 in local table
+2021-07-21 21:45:43,884 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 21:45:43,910 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 21:45:43,927 - kademlia.protocol - INFO - finding neighbors of 288653763007558619533209329403054442215872706752 in local table
+2021-07-21 21:48:35,649 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 21:48:35,674 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 21:48:35,681 - kademlia.protocol - INFO - finding neighbors of 394479066784642955099640521046159980039522238619 in local table
+2021-07-21 22:05:49,084 - kademlia.network - DEBUG - Refreshing routing table
+2021-07-21 22:05:49,090 - kademlia.crawling - INFO - creating spider with peers: [[1303175823489479832752305655967083826298352630775, '192.168.50.61', 8469], [1098218117853989250722143752613456622490611886820, '192.168.50.111', 8469], [1139827136631568738510525028518994511582714402757, '192.168.50.61', 8469], [1199095249299229028753503346992619743262209528235, '192.168.50.61', 8469], [924131588117070868229063773895367025797257005726, '192.168.50.111', 8469], [801070062603587927913275346794964303533091819417, '192.168.50.111', 8469], [826133873535020137129845677632017395517399819523, '192.168.50.61', 8469], [394479066784642955099640521046159980039522238619, '192.168.50.109', 8468], [195995527175561803923922852774572087959887960892, '192.168.50.109', 8468], [234150112385717407254396517857841446016900154922, '192.168.50.111', 8469], [240960756887134701878563694359199249030964329997, '192.168.50.109', 8468], [288653763007558619533209329403054442215872706752, '192.168.50.109', 8468], [127417725429126172047290313571581661926318092926, '192.168.50.109', 8468], [173272442161499200772890961676711037067472464045, '192.168.50.109', 8468], [173967704501533697179039366931180446494612847354, '192.168.50.109', 8469]]
+2021-07-21 22:05:49,099 - kademlia.crawling - INFO - crawling network with nearest: ([1303175823489479832752305655967083826298352630775, '192.168.50.61', 8469], [1098218117853989250722143752613456622490611886820, '192.168.50.111', 8469], [1139827136631568738510525028518994511582714402757, '192.168.50.61', 8469], [1199095249299229028753503346992619743262209528235, '192.168.50.61', 8469], [924131588117070868229063773895367025797257005726, '192.168.50.111', 8469], [801070062603587927913275346794964303533091819417, '192.168.50.111', 8469], [826133873535020137129845677632017395517399819523, '192.168.50.61', 8469], [394479066784642955099640521046159980039522238619, '192.168.50.109', 8468], [195995527175561803923922852774572087959887960892, '192.168.50.109', 8468], [234150112385717407254396517857841446016900154922, '192.168.50.111', 8469], [240960756887134701878563694359199249030964329997, '192.168.50.109', 8468], [288653763007558619533209329403054442215872706752, '192.168.50.109', 8468], [127417725429126172047290313571581661926318092926, '192.168.50.109', 8468], [173272442161499200772890961676711037067472464045, '192.168.50.109', 8468], [173967704501533697179039366931180446494612847354, '192.168.50.109', 8469])
+Did not receive reply for msg id b'mgOui68E40v1VA6GZdWmfdHMVjU=' within 5 seconds
+2021-07-21 22:05:54,157 - kademlia.protocol - WARNING - no response from 192.168.50.61:8469, removing from router
+Did not receive reply for msg id b'Ob/i6ro39DJe/dLu/0+k/5ZBTxo=' within 5 seconds
+2021-07-21 22:05:54,159 - kademlia.protocol - WARNING - no response from 192.168.50.61:8469, removing from router
+Did not receive reply for msg id b'v1sk3fTyZJDyK28S/IKXEpaafM4=' within 5 seconds
+2021-07-21 22:05:54,166 - kademlia.protocol - WARNING - no response from 192.168.50.111:8469, removing from router
+2021-07-21 22:05:54,170 - kademlia.crawling - INFO - crawling network with nearest: ([1199095249299229028753503346992619743262209528235, '192.168.50.61', 8469], [924131588117070868229063773895367025797257005726, '192.168.50.111', 8469], [801070062603587927913275346794964303533091819417, '192.168.50.111', 8469], [826133873535020137129845677632017395517399819523, '192.168.50.61', 8469], [394479066784642955099640521046159980039522238619, '192.168.50.109', 8468], [195995527175561803923922852774572087959887960892, '192.168.50.109', 8468], [234150112385717407254396517857841446016900154922, '192.168.50.111', 8469], [240960756887134701878563694359199249030964329997, '192.168.50.109', 8468], [288653763007558619533209329403054442215872706752, '192.168.50.109', 8468], [127417725429126172047290313571581661926318092926, '192.168.50.109', 8468], [173272442161499200772890961676711037067472464045, '192.168.50.109', 8468], [173967704501533697179039366931180446494612847354, '192.168.50.109', 8469])
+Did not receive reply for msg id b'DwWcn4nnGxkpBrPEQTTqOKHyDR0=' within 5 seconds
+Did not receive reply for msg id b'VgSq14kwWdGOu2jazv9eMp9P7ug=' within 5 seconds
+2021-07-21 22:05:59,209 - kademlia.protocol - WARNING - no response from 192.168.50.61:8469, removing from router
+2021-07-21 22:05:59,210 - kademlia.protocol - WARNING - no response from 192.168.50.111:8469, removing from router
+Did not receive reply for msg id b'lgW8qY0MfALufRqA8TGSBQBU7r4=' within 5 seconds
+2021-07-21 22:05:59,217 - kademlia.protocol - WARNING - no response from 192.168.50.111:8469, removing from router
+2021-07-21 22:05:59,228 - kademlia.crawling - INFO - crawling network with nearest: ([826133873535020137129845677632017395517399819523, '192.168.50.61', 8469], [394479066784642955099640521046159980039522238619, '192.168.50.109', 8468], [195995527175561803923922852774572087959887960892, '192.168.50.109', 8468], [234150112385717407254396517857841446016900154922, '192.168.50.111', 8469], [240960756887134701878563694359199249030964329997, '192.168.50.109', 8468], [288653763007558619533209329403054442215872706752, '192.168.50.109', 8468], [127417725429126172047290313571581661926318092926, '192.168.50.109', 8468], [173272442161499200772890961676711037067472464045, '192.168.50.109', 8468], [173967704501533697179039366931180446494612847354, '192.168.50.109', 8469])
+Did not receive reply for msg id b'cCOQmJvfHPPHqOPRnxOCmV2hZfI=' within 5 seconds
+Did not receive reply for msg id b'1mJ2Fhl0TE22hxvKkwg+A5d6ZTA=' within 5 seconds
+2021-07-21 22:06:04,270 - kademlia.protocol - WARNING - no response from 192.168.50.109:8468, removing from router
+2021-07-21 22:06:04,271 - kademlia.protocol - WARNING - no response from 192.168.50.61:8469, removing from router
+Did not receive reply for msg id b'Ai+r9vXCqR1c89UCJmkoR/AdAFY=' within 5 seconds
+2021-07-21 22:06:04,278 - kademlia.protocol - WARNING - no response from 192.168.50.109:8468, removing from router
+2021-07-21 22:06:04,290 - kademlia.crawling - INFO - crawling network with nearest: ([234150112385717407254396517857841446016900154922, '192.168.50.111', 8469], [240960756887134701878563694359199249030964329997, '192.168.50.109', 8468], [288653763007558619533209329403054442215872706752, '192.168.50.109', 8468], [127417725429126172047290313571581661926318092926, '192.168.50.109', 8468], [173272442161499200772890961676711037067472464045, '192.168.50.109', 8468], [173967704501533697179039366931180446494612847354, '192.168.50.109', 8469])
+Did not receive reply for msg id b'n+wfabDmY4WezVMHX6A1/hiXR3E=' within 5 seconds
+Did not receive reply for msg id b'tHWqiD7o4Kd7qz52dqXGTgrdev4=' within 5 seconds
+Did not receive reply for msg id b'fiqM72sej/75jRIqjDm97cuVRj0=' within 5 seconds
+2021-07-21 22:06:09,330 - kademlia.protocol - WARNING - no response from 192.168.50.111:8469, removing from router
+2021-07-21 22:06:09,336 - kademlia.protocol - WARNING - no response from 192.168.50.109:8468, removing from router
+2021-07-21 22:06:09,338 - kademlia.protocol - WARNING - no response from 192.168.50.109:8468, removing from router
+2021-07-21 22:06:09,355 - kademlia.crawling - INFO - crawling network with nearest: ([127417725429126172047290313571581661926318092926, '192.168.50.109', 8468], [173272442161499200772890961676711037067472464045, '192.168.50.109', 8468], [173967704501533697179039366931180446494612847354, '192.168.50.109', 8469])
+Did not receive reply for msg id b'33xQxIMNERsR3S3IAntykpyHKGU=' within 5 seconds
+Did not receive reply for msg id b'h7XWL9LkurSs5zL37B/V0LbbdGc=' within 5 seconds
+Did not receive reply for msg id b'MdANYdbKQiYNImQEI0/IozQf2rA=' within 5 seconds
+2021-07-21 22:06:14,444 - kademlia.protocol - WARNING - no response from 192.168.50.109:8468, removing from router
+2021-07-21 22:06:14,445 - kademlia.protocol - WARNING - no response from 192.168.50.109:8469, removing from router
+2021-07-21 22:06:14,446 - kademlia.protocol - WARNING - no response from 192.168.50.109:8468, removing from router
+2021-07-21 22:06:14,449 - kademlia.network - INFO - setting 'e193a01ecf8d30ad0affefd332ce934e32ffce72' on []
+Task exception was never retrieved
+future: <Task finished coro=<Server._refresh_table() done, defined at /home/nodey/BotsideP2P/lib/python3.5/site-packages/kademlia/network.py:82> exception=ValueError('max() arg is an empty sequence',) created at /home/nodey/BotsideP2P/lib/python3.5/site-packages/kademlia/network.py:78>
+source_traceback: Object created at (most recent call last):
+  File examples/bootstrap_tac.py, line 21, in <module>
+    loop.run_forever()
+  File /usr/lib/python3.5/asyncio/base_events.py, line 421, in run_forever
+    self._run_once()
+  File /usr/lib/python3.5/asyncio/base_events.py, line 1416, in _run_once
+    handle._run()
+  File /usr/lib/python3.5/asyncio/events.py, line 126, in _run
+    self._callback(*self._args)
+  File /home/nodey/BotsideP2P/lib/python3.5/site-packages/kademlia/network.py, line 78, in refresh_table
+    asyncio.ensure_future(self._refresh_table())
+Traceback (most recent call last):
+  File /usr/lib/python3.5/asyncio/tasks.py, line 239, in _step
+    result = coro.send(None)
+  File /usr/lib/python3.5/asyncio/coroutines.py, line 125, in send
+    return self.gen.send(value)
+  File /home/nodey/BotsideP2P/lib/python3.5/site-packages/kademlia/network.py, line 100, in _refresh_table
+    await self.set_digest(dkey, value)
+  File /usr/lib/python3.5/asyncio/coroutines.py, line 109, in __next__
+    return self.gen.send(None)
+  File /home/nodey/BotsideP2P/lib/python3.5/site-packages/kademlia/network.py, line 188, in set_digest
+    biggest = max([n.distance_to(node) for n in nodes])
+ValueError: max() arg is an empty sequence
+2021-07-21 22:29:43,398 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 22:29:43,431 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 22:29:43,446 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 22:29:43,454 - kademlia.protocol - INFO - finding neighbors of 358566848832140517743038784667950951230149696696 in local table
+2021-07-21 22:30:16,262 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 22:30:16,285 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 22:30:16,307 - kademlia.protocol - INFO - finding neighbors of 152184957764488506712318660340614146795209771365 in local table
+2021-07-21 22:37:55,389 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 22:37:55,430 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 22:37:55,448 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 22:37:55,457 - kademlia.protocol - INFO - finding neighbors of 445364530626619844175021840355229529202769730564 in local table
+2021-07-21 22:39:25,058 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 22:39:25,093 - kademlia.protocol - INFO - finding neighbors of 179415853580806278282355519158894210647957286089 in local table
+2021-07-21 22:40:07,094 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 22:40:07,125 - kademlia.protocol - INFO - finding neighbors of 943724582926990873326299939328180378019748445199 in local table
+2021-07-21 22:41:00,513 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 22:41:00,537 - kademlia.protocol - INFO - finding neighbors of 859792511573199976766093203051428254860813233360 in local table
+2021-07-21 22:41:30,808 - kademlia.protocol - INFO - never seen 192.168.50.109:8468 before, adding to router
+2021-07-21 22:41:30,843 - kademlia.protocol - INFO - got successful response from 192.168.50.109:8468
+2021-07-21 22:41:30,877 - kademlia.protocol - INFO - finding neighbors of 562729505927435785292183767009673257055016664940 in local table
+
+
