@@ -1,0 +1,65 @@
+(BotsideP2P) nodey@ProjectNode4:~/BotsideP2P$ python botnet_updated.py $BOOT $PORT $PORT
+2021-07-23 22:59:06,627 - kademlia.network - INFO - Node 837924138013958540536852949383707217357307233400 listening on 0.0.0.0:8468
+2021-07-23 22:59:06,629 - kademlia.network - DEBUG - Refreshing routing table
+2021-07-23 22:59:06,631 - kademlia.network - DEBUG - Attempting to bootstrap node with 1 initial contacts
+2021-07-23 22:59:06,637 - kademlia.crawling - INFO - creating spider with peers: [[638025525246344888298927076747685195880027120698, '10.0.0.156', 8468]]
+2021-07-23 22:59:06,638 - kademlia.crawling - INFO - crawling network with nearest: ([638025525246344888298927076747685195880027120698, '10.0.0.156', 8468],)
+2021-07-23 22:59:06,643 - kademlia.protocol - INFO - got successful response from 10.0.0.156:8468
+2021-07-23 22:59:06,644 - kademlia.protocol - INFO - never seen 10.0.0.156:8468 before, adding to router
+2021-07-23 22:59:06,644 - kademlia.crawling - INFO - crawling network with nearest: ([783517357069805763219485057831388602841151833869, '10.0.0.241', 8469], [166038896240116102444281082911482317545491078679, '10.0.0.241', 8469], [1258377381144647744230719601109438532908343950, '10.0.0.241', 8469], [638025525246344888298927076747685195880027120698, '10.0.0.156', 8468])
+Did not receive reply for msg id b'MwqvQkd0+ObRrFIU6JNvzBKLq5k=' within 5 seconds
+Did not receive reply for msg id b'uQMXbBTjB13BandTsSgvkCYgj1c=' within 5 seconds
+Did not receive reply for msg id b'nTEiOja5ksJrwe7InPdLEK0YipE=' within 5 seconds
+2021-07-23 22:59:11,660 - kademlia.protocol - WARNING - no response from 10.0.0.241:8469, removing from router
+2021-07-23 22:59:11,660 - kademlia.protocol - WARNING - no response from 10.0.0.241:8469, removing from router
+2021-07-23 22:59:11,660 - kademlia.protocol - WARNING - no response from 10.0.0.241:8469, removing from router
+2021-07-23 22:59:11,661 - kademlia.network - INFO - Looking up key <sha1 HASH object @ 0x7fa97ec56cb0>
+2021-07-23 22:59:11,661 - kademlia.crawling - INFO - creating spider with peers: [[638025525246344888298927076747685195880027120698, '10.0.0.156', 8468]]
+2021-07-23 22:59:11,661 - kademlia.crawling - INFO - crawling network with nearest: ([638025525246344888298927076747685195880027120698, '10.0.0.156', 8468],)
+2021-07-23 22:59:11,667 - kademlia.protocol - INFO - got successful response from 10.0.0.156:8468
+2021-07-23 22:59:11,668 - kademlia.crawling - INFO - crawling network with nearest: ([638025525246344888298927076747685195880027120698, '10.0.0.156', 8468], [1258377381144647744230719601109438532908343950, '10.0.0.241', 8469], [166038896240116102444281082911482317545491078679, '10.0.0.241', 8469], [783517357069805763219485057831388602841151833869, '10.0.0.241', 8469])
+Did not receive reply for msg id b'n+SzZOhNVnnl5Ek/fz817azG3lI=' within 5 seconds
+Did not receive reply for msg id b'oOZ8k9cHePA9IsoQzRz5tqFj06M=' within 5 seconds
+Did not receive reply for msg id b'fWrxQTgvCq3jgiLDKQm4vzt8p58=' within 5 seconds
+2021-07-23 22:59:16,675 - kademlia.protocol - WARNING - no response from 10.0.0.241:8469, removing from router
+2021-07-23 22:59:16,675 - kademlia.protocol - WARNING - no response from 10.0.0.241:8469, removing from router
+2021-07-23 22:59:16,675 - kademlia.protocol - WARNING - no response from 10.0.0.241:8469, removing from router
+Task exception was never retrieved
+future: <Task finished coro=<bootstrapDone() done, defined at botnet_updated.py:132> exception=TypeError('Unicode-objects must be encoded before hashing',) created at botnet_updated.py:150>
+source_traceback: Object created at (most recent call last):
+  File "botnet_updated.py", line 150, in <module>
+    ensure_future(bootstrapDone(server, key))
+Traceback (most recent call last):
+  File "/usr/lib/python3.5/asyncio/tasks.py", line 239, in _step
+    result = coro.send(None)
+  File "botnet_updated.py", line 138, in bootstrapDone
+    await setup(server)
+  File "/usr/lib/python3.5/asyncio/coroutines.py", line 109, in __next__
+    return self.gen.send(None)
+  File "botnet_updated.py", line 127, in setup
+    idhash = get_hash(str(server.node.long_id))
+  File "botnet_updated.py", line 40, in get_hash
+    m.update(prehash)
+TypeError: Unicode-objects must be encoded before hashing
+
+
+
+(BotsideP2P) nodey@ProjecNode5:~/BotsideP2P$ python examples/bootstrap_tac.py
+2021-07-23 22:24:13,526 - kademlia.network - INFO - Node 638025525246344888298927076747685195880027120698 listening on 0.0.0.0:8468
+2021-07-23 22:24:13,531 - kademlia.network - DEBUG - Refreshing routing table
+2021-07-23 22:24:16,546 - kademlia.protocol - INFO - never seen 10.0.0.241:8468 before, adding to router
+2021-07-23 22:24:16,555 - kademlia.protocol - INFO - finding neighbors of 1456024264631501388205219928528465012619906875932 in local table
+2021-07-23 22:24:16,564 - kademlia.protocol - INFO - finding neighbors of 1456024264631501388205219928528465012619906875932 in local table
+
+
+2021-07-23 22:45:28,526 - kademlia.protocol - INFO - never seen 10.0.0.241:8469 before, adding to router
+2021-07-23 22:45:28,531 - kademlia.protocol - INFO - finding neighbors of 1258377381144647744230719601109438532908343950 in local table
+2021-07-23 22:45:33,543 - kademlia.protocol - INFO - finding neighbors of 1258377381144647744230719601109438532908343950 in local table
+2021-07-23 22:45:38,554 - kademlia.protocol - DEBUG - got a store request from ('10.0.0.241', 8469), storing '10a34637ad661d98ba3344717656fcc76209c2f8'='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+2021-07-23 22:46:00,212 - kademlia.protocol - INFO - never seen 10.0.0.241:8469 before, adding to router
+2021-07-23 22:46:00,217 - kademlia.protocol - INFO - finding neighbors of 166038896240116102444281082911482317545491078679 in local table
+2021-07-23 22:47:12,496 - kademlia.protocol - INFO - never seen 10.0.0.241:8469 before, adding to router
+2021-07-23 22:47:12,500 - kademlia.protocol - INFO - finding neighbors of 783517357069805763219485057831388602841151833869 in local table
+2021-07-23 22:59:06,632 - kademlia.protocol - INFO - never seen 10.0.0.241:8468 before, adding to router
+2021-07-23 22:59:06,639 - kademlia.protocol - INFO - finding neighbors of 837924138013958540536852949383707217357307233400 in local table
+2021-07-23 22:59:11,662 - kademlia.protocol - INFO - finding neighbors of 837924138013958540536852949383707217357307233400 in local table

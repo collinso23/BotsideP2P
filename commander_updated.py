@@ -5,6 +5,7 @@
 import asyncio, os, sys, logging
 import hashlib
 from kademlia.network import Server
+SECRET="TheSecretKey"
 
 
 ### Intialize logging 
@@ -54,7 +55,7 @@ myport = int(sys.argv[3])
 
 ### Initialize the Key "specialstring" which all nodes will join network with###
 key = hashlib.sha1()
-key.update('specialstring'.encode('utf-8'))
+key.update(SECRET.encode('utf-8'))
 keyhash = key.hexdigest()
 
 

