@@ -14,17 +14,18 @@ log.setLevel(logging.DEBUG)
 
 loop = asyncio.get_event_loop()
 loop.set_debug(True)
-
+port=8468
+kserver = Server()
+loop.run_until_complete(kserver.listen(8468))
 
 if os.path.isfile('cache.pickle'):
-    kserver = Server.loadState('cache.pickle')
-else:
-    kserver = Server()
-    loop.run_until_complete(kserver.bootstrap([("127.0.0.1", 8468)]))
+    kserver = loop.run_until_complete(Server.load_state('cache.pickle',port))
+else:   
+    loop.run_until_complete(kserver.bootstrap([("127.0.0.1", port)]))
 
-kserver.saveStateRegularly('cache.pickle', 10)
+kserver.save_state_regularly('cache.pickle', 300)
 
-loop.run_until_complete(kserver.listen(8468))
+
 
 try:
     loop.run_forever()
