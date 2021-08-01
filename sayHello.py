@@ -1,0 +1,1 @@
+print("\nHELLO Shepard, Ima bot :)\n\n\n")
