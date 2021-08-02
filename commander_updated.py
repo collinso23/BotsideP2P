@@ -5,7 +5,8 @@
 #### Nodes will be organized into two types SHEEP = passive listeners which execute commands, and SHEPARDS = commander nodes which administer commands
 """
 
-import asyncio, os, sys, logging, pdb
+import asyncio, os, sys, logging, pdb, functools
+from subprocess import check_call
 from asyncio.tasks import ensure_future
 import hashlib
 from kademlia.network import Server
@@ -36,7 +37,9 @@ class Shepard():
         self.count = 0
         #TODO: add looping call to check for new nodes
         #self.sheeploop = loop.call_soon_threadsafe(checknewsheep())
-
+        #self.sheeploop = loop.call_later(8, functools.partial(self.checknewsheep())) 
+        #self.checkin = loop.call_soon_threadsafe( self.checknewsheep())
+  
     async def checknewsheep(self):
         async def addsheep(val): 
             if val:
@@ -47,17 +50,22 @@ class Shepard():
                     self.sheeps[val] = newval
                     print("\nSetting key {} to value {}\n".format(val, newval))
                     ## Set the NODEID 'val' of nearest neightbor to newval 'cmdkey of the bot'
-                    await self.kserver.set(self.sheeps[val], str(val))
+                    result = await self.kserver.set(self.sheeps[val], str(val))
                     #TODO: Commander hangs after set, node goes into loop saying that is has acked the network, and recieved a command, but not command is ever run.
                     # /(.-.)\ Hmm need to find out why this happens, maybe the sheepGreater() never ran thats why there is error. 
                     # Update: I dont think the task ever returns from await state, maybe something needs to be returned here. 
-                    pass
+                    print("Added a new sheep")
+                    return result
+                print("No new sheep")
+                return False    
         pdb.set_trace()
         result = await self.kserver.get(self.key)
-        await addsheep(result)
+        return await addsheep(result)
+        
     
     async def sheepGreeter(self):
         cmd="HELLO"
+        print(await self.checknewsheep())
         #Iterate through sheeps list and send command to all sheep
         for key, val in self.sheeps.items():
             print("\nKEY: {} VAL: {}\nPOSSIBLE ITEMS {}\n\n".format(key,val,self.sheeps.items()))
@@ -78,7 +86,7 @@ bootstrap_port = int(sys.argv[2])
 myport = int(sys.argv[3])
 
 ### Initialize the Key which all nodes will join network with###
-key = get_hash(SECRET)
+NETKEY = get_hash(SECRET)
 
 loop=asyncio.get_event_loop()
 loop.set_debug(True)
@@ -87,11 +95,10 @@ kserver = Server()
 loop.run_until_complete(kserver.listen(myport))
 loop.run_until_complete(kserver.bootstrap([(bootstrap_ip, bootstrap_port)]))
 
-leader = Shepard(kserver, key)
+leader = Shepard(kserver, NETKEY)
 
 try:
-    ensure_future(leader.checknewsheep())
-    pdb.set_trace()
+    #pdb.set_trace()
     loop.run_until_complete(leader.sheepGreeter())
     loop.run_forever()
 except KeyboardInterrupt:
