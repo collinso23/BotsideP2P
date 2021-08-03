@@ -23,9 +23,8 @@ if os.path.isfile('cache.pickle'):
 else:   
     loop.run_until_complete(kserver.bootstrap([("127.0.0.1", port)]))
 
-kserver.save_state_regularly('cache.pickle', 300)
-
-
+#Removing save currently fills routing table with duplicate entries.
+#kserver.save_state_regularly('cache.pickle', 300)
 
 try:
     loop.run_forever()

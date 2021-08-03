@@ -25,7 +25,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 log = logging.getLogger('kademlia')
 log.addHandler(handler)
-log.setLevel(logging.DEBUG)
+#log.setLevel(logging.WARN) #DEBUG
 
 ### Class which checks for existing networks, and will create its own key/val and join
 class Shepard():
@@ -39,7 +39,9 @@ class Shepard():
         #self.sheeploop = loop.call_soon_threadsafe(checknewsheep())
         #self.sheeploop = loop.call_later(8, functools.partial(self.checknewsheep())) 
         #self.checkin = loop.call_soon_threadsafe( self.checknewsheep())
-  
+    """
+    Checks if new sheep are present otherwise returns false
+    """
     async def checknewsheep(self):
         async def addsheep(val): 
             if val:
@@ -58,21 +60,28 @@ class Shepard():
                     return result
                 print("No new sheep")
                 return False    
-        pdb.set_trace()
+        #pdb.set_trace()
         result = await self.kserver.get(self.key)
         return await addsheep(result)
         
-    
+    """
+    When new sheep joins the network, load sayHello program and execute
+    """
     async def sheepGreeter(self):
         cmd="HELLO"
-        print(await self.checknewsheep())
+        #print()
         #Iterate through sheeps list and send command to all sheep
-        for key, val in self.sheeps.items():
-            print("\nKEY: {} VAL: {}\nPOSSIBLE ITEMS {}\n\n".format(key,val,self.sheeps.items()))
-            output= "Starting HELLO for bot {0}\n".format(key)
-            print(output)
-            botcmdtorun = get_hash(cmd)
-            await self.kserver.set(val,botcmdtorun)
+        while await self.checknewsheep():
+            for key, val in self.sheeps.items():
+                #print("\nKEY: {} VAL: {}\nPOSSIBLE ITEMS {}\n\n".format(key,val,self.sheeps.items()))
+                output= "Starting HELLO for bot {0}\n".format(key)
+                print(output)
+                botcmdtorun = get_hash(cmd)
+                await self.kserver.set(val,botcmdtorun)
+                asyncio.sleep(5)
+            #if await self.checknewsheep():
+            #    break
+
 
 if len(sys.argv) != 4:
     print("Usage: python commander.py <bootstrap node> <bootstrap port> <commander port>")

