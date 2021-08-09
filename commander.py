@@ -25,7 +25,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 log = logging.getLogger('kademlia')
 log.addHandler(handler)
-#log.setLevel(logging.WARN) #DEBUG
+#log.setLevel(logging.DEBUG) #DEBUG: Adjust to change log level
 
 ### Class which checks for existing networks, and will create its own key/val and join
 class Shepard():
@@ -42,6 +42,7 @@ class Shepard():
     """
     Checks if new sheep are present otherwise returns false
     """
+    #TODO: when a new sheep is added will update self.sheeps with {nodeID:cmdKey} 
     async def checknewsheep(self):
         async def addsheep(val): 
             if val:
@@ -50,12 +51,12 @@ class Shepard():
                     # Create new UUID for node
                     newval = get_hash(str(val))
                     self.sheeps[val] = newval
-                    print("\nSetting key {} to value {}\n".format(val, newval))
+                    print("\nSetting Key:\nNodeID: {}\nValue: {}\n".format(val, newval))
                     ## Set the NODEID 'val' of nearest neightbor to newval 'cmdkey of the bot'
                     result = await self.kserver.set(self.sheeps[val], str(val))
                     #TODO: Commander hangs after set, node goes into loop saying that is has acked the network, and recieved a command, but not command is ever run.
-                    # /(.-.)\ Hmm need to find out why this happens, maybe the sheepGreater() never ran thats why there is error. 
-                    # Update: I dont think the task ever returns from await state, maybe something needs to be returned here. 
+                    # Update: I dont think the task ever returns from await state
+                    # Update: added return statements 
                     print("Added a new sheep")
                     return result
                 print("No new sheep")
@@ -79,10 +80,12 @@ class Shepard():
                 botcmdtorun = get_hash(cmd)
                 await self.kserver.set(val,botcmdtorun)
                 asyncio.sleep(5)
-            #if await self.checknewsheep():
-            #    break
+            if await self.checknewsheep():
+                break
 
-
+#TODO: Create Driver to allow person to manually admin commands
+#TODO: Create function to check for new sheep, add them then perform CMD for all sheep in Dict self.sheeps. Need to derive a dict from server.get(). 
+#TODO: Init waitHandler, which will set the programs default task to checking for new nodes and adding them to the network. 
 if len(sys.argv) != 4:
     print("Usage: python commander.py <bootstrap node> <bootstrap port> <commander port>")
     sys.exit(1)
