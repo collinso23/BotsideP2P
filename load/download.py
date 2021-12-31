@@ -1,4 +1,5 @@
-import os, sys, httplib
+import os, sys
+from http import client
 
 def download(host, port, filepath):
     conn = httplib.HTTPConnection(host, port)

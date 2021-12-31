@@ -26,7 +26,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 log = logging.getLogger('kademlia')
 log.addHandler(handler)
-#log.setLevel(logging.DEBUG) #DEBUG: Adjust to change log level
+log.setLevel(logging.DEBUG) #DEBUG: Adjust to change log level
 
 ### Class which checks for existing networks, and will create its own key/val and join
 class Shepard():

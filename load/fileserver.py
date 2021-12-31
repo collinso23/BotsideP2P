@@ -1,5 +1,6 @@
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from SocketServer import ThreadingMixIn
+import http, socketserver
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn  
 import cgi, sys, os, threading
 
 class RequestHandler(BaseHTTPRequestHandler):
