@@ -1,11 +1,13 @@
 Init Queue datastructure to handle command processing
 https://stackoverflow.com/questions/55151635/python-event-handler-with-async-non-blocking-while-loop
 
-Jornal entry
+August 2021
 Bot is semi working. Currently trying to work out the best way to monitor network for newly joined machines and append their nodeIDs and command Keys to commander node.
-
 I was able to get the command node working with multiple new hosts. Start bots, start commander, then commander will send commands to each node. 
-
 commander only looks to caputure the new nodes when they first join the network. It is unable to detect multiple nodes that have already joined network.
-
 If commander is started before bots are started the commander wont give out commands
+
+
+January 2022: 
+Bot basic functionalilty is implemented. There is still lots of room for improvement. I left ##TODO on areas I want to revist and improve. 
+There is also a list of possible next steps listed in the README to help make the modules more secure, and aid visualization. 

