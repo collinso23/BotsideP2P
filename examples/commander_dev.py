@@ -26,7 +26,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 log = logging.getLogger('kademlia')
 log.addHandler(handler)
-log.setLevel(logging.DEBUG) #DEBUG: Adjust to change log level
+log.setLevel(logging.INFO) #DEBUG: Adjust to change log level
 
 ### Class which checks for existing networks, and will create its own key/val and join
 class Shepard():
@@ -58,11 +58,11 @@ class Shepard():
                     #RESOLVED: Commander hangs after set, node goes into loop saying that is has acked the network, and recieved a command, but not command is ever run.
                     # Update: I dont think the task ever returns from await state
                     # Update: added return statements 
-                    print("Added a new sheep")
-                    pp.pprint(leader._sheeps)
+                    log.info("Added a new sheep")
+                    log.info(leader._sheeps) 
                     await self.sheepGreeter()
                     return result
-                #print("No new sheep")
+                log.info("No new sheep")
                 return False    
         #pdb.set_trace()
         asyncio.sleep(5)
@@ -79,7 +79,7 @@ class Shepard():
         while await self.checknewsheep(): #Loop while this is true
             for key, val in self._sheeps.items():
                 #print("\nKEY: {} VAL: {}\nPOSSIBLE ITEMS {}\n\n".format(key,val,self.sheeps.items()))
-                print("Starting HELLO for bot ID {}\nCMD_VALUE:{}".format(key,val))
+                log.info("Starting HELLO for bot ID {}\nCMD_VALUE:{}".format(key,val))
                 botcmdtorun = get_hash(cmd) #"HELLO" is currently static command -> sayHello.py
                 await self._kserver.set(val,botcmdtorun)
                 asyncio.sleep(5)
@@ -130,7 +130,7 @@ try:
         #time.sleep(5)
         #print(leader._sheeps)
         if loop_counter > 10000: #kill before infinity happens 10000
-            print("to many loop")
+            log.warning("TO MANY LOOPS")
             break
     loop.run_forever()
 except KeyboardInterrupt:

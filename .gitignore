@@ -4,4 +4,3 @@ include*
 lib*
 pyenv.cfg
 share*
-load*
